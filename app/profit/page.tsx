@@ -36,8 +36,8 @@ export default function ProfitCalculatorPage() {
                 className="flex items-center justify-center gap-1 md:gap-2 w-full text-xs md:text-sm"
               >
                 <Truck className="h-3 w-3 md:h-4 md:w-4" />
-                <span className="hidden sm:inline">物流计算器</span>
-                <span className="sm:hidden">物流</span>
+                <span className="hidden sm:block">物流计算器</span>
+                <span className="block sm:hidden">物流</span>
               </Button>
             </Link>
             <Link href="/profit" className="flex-1">
@@ -46,8 +46,8 @@ export default function ProfitCalculatorPage() {
                 className="flex items-center justify-center gap-1 md:gap-2 w-full text-xs md:text-sm"
               >
                 <Calculator className="h-3 w-3 md:h-4 md:w-4" />
-                <span className="hidden sm:inline">利润计算器</span>
-                <span className="sm:hidden">利润</span>
+                <span className="hidden sm:block">利润计算器</span>
+                <span className="block sm:hidden">利润</span>
               </Button>
             </Link>
           </div>
