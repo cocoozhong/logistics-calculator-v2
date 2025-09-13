@@ -1,125 +1,82 @@
-# 🚀 部署指南
+# GitHub Pages 部署指南
 
-## GitHub Pages 部署
+## 步骤1：创建GitHub仓库
 
-### 1. 准备工作
+1. 访问 [GitHub](https://github.com)
+2. 点击右上角的 "+" 按钮，选择 "New repository"
+3. 填写仓库信息：
+   - **Repository name**: `logistics-calculator`
+   - **Description**: `智能物流费用计算器 - 支持多物流公司价格对比和利润计算`
+   - **Visibility**: 选择 "Public"（GitHub Pages需要公开仓库）
+   - **不要**勾选 "Add a README file"（我们已经有了）
+   - **不要**勾选 "Add .gitignore"（我们已经有了）
+   - **不要**勾选 "Choose a license"（可选）
+4. 点击 "Create repository"
 
-1. **Fork 项目**
-   - 访问项目仓库
-   - 点击 "Fork" 按钮创建你的副本
+## 步骤2：推送代码到GitHub
 
-2. **修改配置**
-   - 在 `package.json` 中修改 `homepage` 字段为你的 GitHub 用户名
-   - 在 `next.config.js` 中修改 `assetPrefix` 和 `basePath` 为你的仓库名
+在终端中运行以下命令（将 `yourusername` 替换为你的GitHub用户名）：
 
-### 2. 启用 GitHub Pages
+```bash
+# 添加远程仓库
+git remote add origin https://github.com/yourusername/logistics-calculator.git
 
-1. 进入你的仓库设置页面
-2. 滚动到 "Pages" 部分
-3. 在 "Source" 下选择 "GitHub Actions"
+# 推送代码到GitHub
+git push -u origin main
+```
+
+## 步骤3：启用GitHub Pages
+
+1. 在GitHub仓库页面，点击 "Settings" 标签
+2. 在左侧菜单中找到 "Pages"
+3. 在 "Source" 部分：
+   - 选择 "GitHub Actions"
 4. 保存设置
 
-### 3. 自动部署
+## 步骤4：配置GitHub Actions权限
 
-当你推送代码到 `main` 分支时，GitHub Actions 会自动：
-- 安装依赖
-- 构建项目
-- 部署到 GitHub Pages
+1. 在仓库的 "Settings" 页面
+2. 在左侧菜单中找到 "Actions" > "General"
+3. 在 "Workflow permissions" 部分：
+   - 选择 "Read and write permissions"
+   - 勾选 "Allow GitHub Actions to create and approve pull requests"
+4. 点击 "Save"
 
-### 4. 访问你的网站
+## 步骤5：触发部署
 
-部署完成后，你的网站将在以下地址可用：
+1. 推送代码后，GitHub Actions会自动开始构建和部署
+2. 在仓库页面点击 "Actions" 标签查看部署进度
+3. 部署完成后，你的应用将在以下地址可用：
+   `https://yourusername.github.io/logistics-calculator`
+
+## 步骤6：更新README中的链接
+
+部署成功后，记得更新 `README.md` 文件中的链接：
+
+```markdown
+访问地址：https://yourusername.github.io/logistics-calculator
 ```
-https://你的用户名.github.io/logistics-calculator
-```
-
-## 本地开发
-
-### 安装依赖
-```bash
-npm install
-```
-
-### 启动开发服务器
-```bash
-npm run dev
-```
-
-访问 [http://localhost:3000](http://localhost:3000) 查看应用。
-
-### 构建生产版本
-```bash
-npm run build
-```
-
-## 自定义配置
-
-### 修改物流公司数据
-
-1. 编辑 `data/` 目录下的 JSON 文件
-2. 更新价格和地区信息
-3. 重新部署
-
-### 添加新的物流公司
-
-1. 在 `data/` 目录添加新的 JSON 文件
-2. 在 `lib/price-calculator.ts` 中添加计算逻辑
-3. 更新 `lib/types.ts` 中的类型定义
-
-### 自定义样式
-
-- 修改 `app/globals.css` 中的 CSS 变量
-- 更新 `tailwind.config.js` 中的主题配置
 
 ## 故障排除
 
-### 常见问题
+### 如果部署失败：
+1. 检查 GitHub Actions 日志
+2. 确保仓库是公开的
+3. 确保 GitHub Actions 权限已正确设置
+4. 检查 `next.config.js` 中的配置
 
-1. **部署失败**
-   - 检查 GitHub Actions 日志
-   - 确保所有依赖都正确安装
+### 如果页面无法访问：
+1. 等待几分钟让GitHub Pages生效
+2. 检查URL是否正确
+3. 清除浏览器缓存
 
-2. **页面无法访问**
-   - 检查仓库设置中的 Pages 配置
-   - 确认 GitHub Actions 工作流已成功运行
+## 自定义域名（可选）
 
-3. **样式问题**
-   - 清除浏览器缓存
-   - 检查 Tailwind CSS 配置
+如果你想使用自定义域名：
+1. 在仓库根目录创建 `CNAME` 文件
+2. 在文件中写入你的域名
+3. 在域名服务商处配置CNAME记录指向 `yourusername.github.io`
 
-### 获取帮助
+## 自动更新
 
-如果遇到问题，请：
-1. 检查 GitHub Issues
-2. 创建新的 Issue 描述问题
-3. 提供详细的错误信息和步骤
-
-## 性能优化
-
-### 生产环境优化
-
-1. **图片优化**
-   - 使用 WebP 格式
-   - 压缩图片大小
-
-2. **代码分割**
-   - Next.js 自动处理代码分割
-   - 使用动态导入优化加载
-
-3. **缓存策略**
-   - 配置适当的缓存头
-   - 使用 CDN 加速
-
-## 安全考虑
-
-1. **环境变量**
-   - 不要在代码中硬编码敏感信息
-   - 使用环境变量管理配置
-
-2. **依赖安全**
-   - 定期更新依赖包
-   - 使用 `npm audit` 检查安全漏洞
-
-3. **内容安全策略**
-   - 配置 CSP 头
-   - 限制外部资源加载
+每次你推送代码到 `main` 分支时，GitHub Actions会自动重新部署你的应用。

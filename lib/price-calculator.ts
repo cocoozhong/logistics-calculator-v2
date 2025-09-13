@@ -66,14 +66,14 @@ export function calculatePrices(province: string, city: string, weight: number):
  */
 function calculateXinliangPriceWithDetail(province: string, city: string, weight: number): { price: number | null, leadTime: string, note?: string } {
   try {
-    const provinceData = pricesData.data[province]
+    const provinceData = (pricesData.data as any)[province]
     if (!provinceData) {
       return { price: null, leadTime: '', note: '该省份暂无数据' }
     }
     
     // 如果有具体城市，优先使用城市数据
     if (city && city.trim()) {
-      const cityData = provinceData[city]
+      const cityData = (provinceData as any)[city]
       if (cityData) {
         const price = calculatePriceByWeight(cityData.rates, weight)
         return { 
@@ -87,7 +87,7 @@ function calculateXinliangPriceWithDetail(province: string, city: string, weight
     // 如果没有城市或城市不存在，使用省份参考价格
     const cities = Object.keys(provinceData)
     if (cities.length > 0) {
-      const cityData = provinceData[cities[0]]
+      const cityData = (provinceData as any)[cities[0]]
       const price = calculatePriceByWeight(cityData.rates, weight)
       return { 
         price, 
@@ -108,7 +108,7 @@ function calculateXinliangPriceWithDetail(province: string, city: string, weight
  */
 function calculateSFPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
   try {
-    const regionData = sfData.regions[province]
+    const regionData = (sfData.regions as any)[province]
     if (!regionData) {
       return { price: null, note: '该省份暂无数据' }
     }
@@ -138,7 +138,7 @@ function calculateSFPriceWithDetail(province: string, weight: number): { price: 
  */
 function calculateShentongPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
   try {
-    const regionData = shentongData.regions[province]
+    const regionData = (shentongData.regions as any)[province]
     if (!regionData) {
       return { price: null, note: '该省份暂无数据' }
     }
@@ -187,17 +187,17 @@ function calculatePriceByWeight(rates: any, weight: number): number | null {
  */
 function calculateXinliangPrice(province: string, city: string, weight: number): number | null {
   try {
-    const provinceData = pricesData.data[province]
+    const provinceData = (pricesData.data as any)[province]
     if (!provinceData) return null
     
     // 优先使用城市数据，如果没有则使用省份数据
-    let cityData = provinceData[city]
+    let cityData = (provinceData as any)[city]
     if (!cityData || city === '') {
       // 如果城市不存在或为空，使用省份的参考数据
       // 查找省份下的第一个城市作为参考
       const cities = Object.keys(provinceData)
       if (cities.length > 0) {
-        cityData = provinceData[cities[0]]
+        cityData = (provinceData as any)[cities[0]]
         console.log(`使用省份 ${province} 的参考价格（基于 ${cities[0]}）`)
       }
     }
@@ -237,7 +237,7 @@ function calculateXinliangPrice(province: string, city: string, weight: number):
  */
 function calculateSFPrice(province: string, weight: number): number | null {
   try {
-    const regionData = sfData.regions[province]
+    const regionData = (sfData.regions as any)[province]
     if (!regionData) return null
     
     const firstKg = regionData.first_kg
@@ -259,7 +259,7 @@ function calculateSFPrice(province: string, weight: number): number | null {
  */
 function calculateShentongPrice(province: string, weight: number): number | null {
   try {
-    const regionData = shentongData.regions[province]
+    const regionData = (shentongData.regions as any)[province]
     if (!regionData) return null
     
     const base = regionData.base
@@ -281,16 +281,16 @@ function calculateShentongPrice(province: string, weight: number): number | null
  */
 function getLeadTime(province: string, city: string): string {
   try {
-    const provinceData = pricesData.data[province]
+    const provinceData = (pricesData.data as any)[province]
     if (!provinceData) return ''
     
     // 优先使用城市数据，如果没有则使用省份数据
-    let cityData = provinceData[city]
+    let cityData = (provinceData as any)[city]
     if (!cityData || city === '') {
       // 如果城市不存在或为空，使用省份下第一个城市的时效
       const cities = Object.keys(provinceData)
       if (cities.length > 0) {
-        cityData = provinceData[cities[0]]
+        cityData = (provinceData as any)[cities[0]]
       }
     }
     
