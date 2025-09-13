@@ -1,0 +1,133 @@
+{
+  "express": "顺丰快递",
+  "currency": "CNY",
+  "unit": "kg",
+  "origin": "无锡市",
+  "rate_model": "first_weight_additional",
+  "regions": {
+    "江苏省": {
+      "first_kg": 6.0,
+      "additional_per_kg": 0.9
+    },
+    "浙江省": {
+      "first_kg": 6.0,
+      "additional_per_kg": 0.9
+    },
+    "上海市": {
+      "first_kg": 6.0,
+      "additional_per_kg": 1.0
+    },
+    "安徽省": {
+      "first_kg": 6.0,
+      "additional_per_kg": 1.0
+    },
+    "湖北省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "河南省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "江西省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "山东省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "福建省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "北京市": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "天津市": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "河北省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "山西省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "湖南省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "广东省": {
+      "first_kg": 7.0,
+      "additional_per_kg": 1.8
+    },
+    "陕西省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "黑龙江省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "吉林省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "辽宁省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "甘肃省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "宁夏": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "青海省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "内蒙古": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "广西": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "海南省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "云南省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "贵州省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "四川省": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "重庆市": {
+      "first_kg": 8.0,
+      "additional_per_kg": 2.2
+    },
+    "新疆": {
+      "first_kg": 12.0,
+      "additional_per_kg": 8.0
+    },
+    "西藏": {
+      "first_kg": 12.0,
+      "additional_per_kg": 8.0
+    }
+  }
+}

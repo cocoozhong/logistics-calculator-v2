@@ -1,0 +1,594 @@
+{
+  "currency": "CNY",
+  "unit": "kg",
+  "tiers": [
+    "≤50kg",
+    "50-100kg",
+    "200-500kg",
+    "500-1000kg",
+    "1000-3000kg",
+    "≥3000kg"
+  ],
+  "data": {
+    "浙江省": {
+      "杭州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "富阳市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "临安市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "绍兴市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "诸暨市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "上虞市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "嘉兴市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "嵊州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "慈溪市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "余姚市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "湖州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "海宁市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "桐乡市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "衢州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "金华市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "东阳市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "兰溪市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "永康市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "义乌市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "丽水市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.4
+        }
+      },
+      "台州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.4
+        }
+      },
+      "乐清市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.45,
+          "≥3000kg": 0.4
+        }
+      },
+      "温岭市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.45,
+          "≥3000kg": 0.4
+        }
+      },
+      "奉化市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "宁波市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "温州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.5,
+          "1000-3000kg": 0.45,
+          "≥3000kg": 0.4
+        }
+      },
+      "瑞安市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.45,
+          "≥3000kg": 0.4
+        }
+      },
+      "舟山市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.55,
+          "≥3000kg": 0.5
+        }
+      }
+    },
+    "江苏省": {
+      "苏州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "泰州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "无锡市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "镇江市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "吴江市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "张家港市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "常熟市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "昆山市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "江阴市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "金坛市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "常州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "丹阳市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "高港市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "泰兴市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "扬州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "盐城市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "南通市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      },
+      "宿迁市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "淮安市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "徐州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "邳州市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "连云港市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      },
+      "南京市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.7,
+          "1000-3000kg": 0.4,
+          "≥3000kg": 0.35
+        }
+      }
+    },
+    "上海市": {
+      "上海市": {
+        "lead_time_days": "1-2天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 30.0,
+          "200-500kg": 0.6,
+          "1000-3000kg": 0.35,
+          "≥3000kg": 0.3
+        }
+      }
+    },
+    "北京市": {
+      "北京": {
+        "lead_time_days": "2-3天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.8,
+          "1000-3000kg": 0.5,
+          "≥3000kg": 0.4
+        }
+      }
+    },
+    "广东省": {
+      "广州市": {
+        "lead_time_days": "3-4天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.8,
+          "1000-3000kg": 0.65,
+          "≥3000kg": 0.6
+        }
+      },
+      "深圳市": {
+        "lead_time_days": "3-4天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.8,
+          "1000-3000kg": 0.65,
+          "≥3000kg": 0.6
+        }
+      },
+      "东莞市": {
+        "lead_time_days": "3-4天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.8,
+          "1000-3000kg": 0.65,
+          "≥3000kg": 0.6
+        }
+      },
+      "佛山市": {
+        "lead_time_days": "3-4天",
+        "rate_model": "by_weight_brackets",
+        "rates": {
+          "≤50kg": 40.0,
+          "200-500kg": 0.8,
+          "1000-3000kg": 0.65,
+          "≥3000kg": 0.6
+        }
+      }
+    }
+  }
+}

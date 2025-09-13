@@ -1,0 +1,136 @@
+{
+  "express": "申通快递",
+  "currency": "CNY",
+  "unit": "kg",
+  "base_rule": {
+    "0-1": 3.5,
+    "1.01-2": 4.0,
+    "2.01-3": 4.5
+  },
+  "regions": {
+    "江苏省": {
+      "base": 3.5,
+      "extra_per_kg": 0.8
+    },
+    "浙江省": {
+      "base": 3.5,
+      "extra_per_kg": 0.8
+    },
+    "安徽省": {
+      "base": 3.5,
+      "extra_per_kg": 0.8
+    },
+    "上海市": {
+      "base": 3.5,
+      "extra_per_kg": 0.8
+    },
+    "北京市": {
+      "base": 3.5,
+      "extra_per_kg": 1.6
+    },
+    "河北省": {
+      "base": 3.5,
+      "extra_per_kg": 1.6
+    },
+    "天津市": {
+      "base": 3.5,
+      "extra_per_kg": 1.6
+    },
+    "山东省": {
+      "base": 3.5,
+      "extra_per_kg": 1.6
+    },
+    "河南省": {
+      "base": 3.5,
+      "extra_per_kg": 1.6
+    },
+    "湖北省": {
+      "base": 3.5,
+      "extra_per_kg": 1.8
+    },
+    "湖南省": {
+      "base": 3.5,
+      "extra_per_kg": 1.8
+    },
+    "江西省": {
+      "base": 3.5,
+      "extra_per_kg": 1.8
+    },
+    "福建省": {
+      "base": 3.5,
+      "extra_per_kg": 1.8
+    },
+    "广东省": {
+      "base": 3.5,
+      "extra_per_kg": 1.8
+    },
+    "陕西省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "重庆市": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "山西省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "贵州省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "辽宁省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "吉林省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "广西": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "云南省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "四川省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "黑龙江省": {
+      "base": 3.5,
+      "extra_per_kg": 2.2
+    },
+    "海南省": {
+      "base": 3.5,
+      "extra_per_kg": 3.5
+    },
+    "青海省": {
+      "base": 3.5,
+      "extra_per_kg": 4.0
+    },
+    "宁夏": {
+      "base": 3.5,
+      "extra_per_kg": 4.0
+    },
+    "内蒙古": {
+      "base": 3.5,
+      "extra_per_kg": 4.0
+    },
+    "甘肃省": {
+      "base": 3.5,
+      "extra_per_kg": 4.0
+    },
+    "新疆": {
+      "base": 3.5,
+      "extra_per_kg": 12.0
+    },
+    "西藏": {
+      "base": 3.5,
+      "extra_per_kg": 15.0
+    }
+  }
+}
