@@ -78,24 +78,26 @@ export default function HomePage() {
       {/* 导航栏 */}
       <div className="flex justify-center pt-4 md:pt-8 pb-2 md:pb-4">
         <div className="flex bg-white rounded-lg p-1 shadow-sm border w-full max-w-sm">
-          <Link href="/" className="flex-1">
-            <Button 
-              variant="default" 
-              className="flex items-center justify-center gap-1 md:gap-2 w-full text-xs md:text-sm"
-            >
+          <Button 
+            asChild
+            variant="default" 
+            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
+          >
+            <Link href="/">
               <Truck className="h-3 w-3 md:h-4 md:w-4" />
               <span>物流计算器</span>
-            </Button>
-          </Link>
-          <Link href="/profit" className="flex-1">
-            <Button 
-              variant="ghost" 
-              className="flex items-center justify-center gap-1 md:gap-2 w-full text-xs md:text-sm"
-            >
+            </Link>
+          </Button>
+          <Button 
+            asChild
+            variant="ghost" 
+            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
+          >
+            <Link href="/profit">
               <Calculator className="h-3 w-3 md:h-4 md:w-4" />
               <span>利润计算器</span>
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 
