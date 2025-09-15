@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Truck, Calculator } from 'lucide-react'
 import Link from 'next/link'
 
+// Force redeploy to fix UI display
 export default function HomePage() {
   const [province, setProvince] = useState('')
   const [city, setCity] = useState('')
