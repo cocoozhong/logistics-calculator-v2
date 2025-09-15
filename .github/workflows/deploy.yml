@@ -33,13 +33,14 @@ jobs:
     - name: Build
       run: npm run build --no-cache
       
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
-      if: github.ref == 'refs/heads/main'
-      with:
-        path: ./out
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: Deploy to gh-pages
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git checkout gh-pages
+        rm -rf *
+        cp -r out/* .
+        git add .
+        git commit -m "Deploy from main branch" || exit 0
+        git push origin gh-pages
       if: github.ref == 'refs/heads/main'
