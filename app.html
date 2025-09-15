@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>智能物流与利润计算器（独立版）</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a;background:linear-gradient(135deg,#eff6ff,#e0e7ff)}
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+    .hstack{display:flex;align-items:center;gap:8px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:#eef2ff;border-radius:10px;padding:6px;width:280px;margin:16px auto}
+    .tab{height:40px;border-radius:8px;padding:0 16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .tab.active{background:#2563eb;color:#fff}
+    h1{color:#2563eb;text-align:center;margin:12px 0 8px}
+    .muted{text-align:center;color:#4b5563;margin-bottom:16px}
+    textarea,input{border:1px solid #e5e7eb;border-radius:8px;padding:8px;width:100%;box-sizing:border-box}
+    .section{padding:24px;margin:12px 0}
+    .clear{border:1px solid #e5e7eb;background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer}
+    .grid{display:grid;gap:12px}
+    @media(min-width:1024px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+    .price{font-size:28px;font-weight:700;color:#374151;text-align:center}
+    .sub{font-size:12px;color:#6b7280;text-align:center}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <a id="btn-calc" class="tab active" href="#calc">物流计算器</a>
+      <a id="btn-profit" class="tab" href="#profit">利润计算器</a>
+    </div>
+    <h1>智能物流费用计算工具</h1>
+    <p class="muted">多物流公司价格对比，智能地址解析，移动端优化</p>
+
+    <main id="view-calc">
+      <section class="card section">
+        <h3>智能地址解析</h3>
+        <p class="muted" style="text-align:left">直接粘贴包含姓名、电话、地址的完整信息，系统会自动解析</p>
+        <textarea id="address" rows="4" placeholder="例如：张三 13812345678 浙江省杭州市西湖区文三路123号"></textarea>
+      </section>
+
+      <section class="card section">
+        <div class="hstack" style="justify-content:space-between">
+          <div>
+            <h3 style="margin:0 0 4px">货物重量</h3>
+            <p class="muted" style="text-align:left;margin:0">请输入货物的重量（公斤）</p>
+          </div>
+          <button id="btn-clear" class="clear">一键清除</button>
+        </div>
+        <div class="hstack" style="margin-top:10px">
+          <input id="weight" type="number" step="0.1" min="0.01" placeholder="请输入重量" />
+          <span class="muted">kg</span>
+        </div>
+      </section>
+
+      <section class="grid grid-3">
+        <div class="card section">
+          <h3>新亮物流</h3>
+          <div id="p-xinliang" class="price">--</div>
+          <div class="sub">CNY</div>
+        </div>
+        <div class="card section">
+          <h3>申通快递</h3>
+          <div id="p-shentong" class="price">--</div>
+          <div class="sub">CNY</div>
+        </div>
+        <div class="card section">
+          <h3>顺丰快递</h3>
+          <div id="p-shunfeng" class="price">--</div>
+          <div class="sub">CNY</div>
+        </div>
+      </section>
+    </main>
+
+    <main id="view-profit" class="hidden">
+      <section class="grid" style="grid-template-columns:1fr;gap:12px">
+        <div class="card section">
+          <h3>N点售价</h3>
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div>
+              <label>产品人民币成本:</label>
+              <input id="cost" type="number" step="0.01" placeholder="请输入成本" />
+            </div>
+            <div>
+              <label>利润点(%):</label>
+              <input id="rate" type="number" step="0.01" placeholder="请输入利润率" />
+            </div>
+          </div>
+          <div class="hstack" style="justify-content:space-between;margin-top:10px">
+            <div id="res-profit">利润: 0.00 RMB</div>
+            <div id="res-sell">人民币售价: 0.00 RMB</div>
+          </div>
+        </div>
+        <div class="card section">
+          <h3>赚几个点</h3>
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div>
+              <label>产品人民币成本:</label>
+              <input id="rcost" type="number" step="0.01" placeholder="请输入成本" />
+            </div>
+            <div>
+              <label>产品人民币售价:</label>
+              <input id="rprice" type="number" step="0.01" placeholder="请输入售价" />
+            </div>
+          </div>
+          <div style="margin-top:10px" id="res-rate">利润点: 0.00%</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function(){
+      function qs(id){return document.getElementById(id)}
+      function show(view){
+        qs('view-calc').classList.toggle('hidden', view!=='calc');
+        qs('view-profit').classList.toggle('hidden', view!=='profit');
+        qs('btn-calc').classList.toggle('active', view==='calc');
+        qs('btn-profit').classList.toggle('active', view==='profit');
+      }
+      function fromHash(){ var h=(location.hash||'#calc').replace('#',''); show(h==='profit'?'profit':'calc'); }
+      qs('btn-calc').addEventListener('click',function(){ location.hash='#calc'; fromHash(); });
+      qs('btn-profit').addEventListener('click',function(){ location.hash='#profit'; fromHash(); });
+      window.addEventListener('hashchange',fromHash);
+      fromHash();
+
+      function round2(n){return (Math.round((n+Number.EPSILON)*100)/100).toFixed(2)}
+      var carriers={ xinliang:{base:8, perKg:1.5, remoteFactor:1.1}, shentong:{base:10, perKg:1.8, remoteFactor:1.15}, shunfeng:{base:16, perKg:2.6, remoteFactor:1.25} };
+      function parseAddr(a){ if(!a) return {remote:false}; return { remote: /(西藏|新疆|内蒙古|青海|甘肃|宁夏|海南)/.test(a) } }
+      function calc(weight, info, cfg){ if(!weight||weight<=0) return null; var price=cfg.base+cfg.perKg*weight; if(info.remote) price*=cfg.remoteFactor; return round2(price); }
+      function update(){ var addr=qs('address').value.trim(); var w=parseFloat(qs('weight').value); var info=parseAddr(addr); qs('p-xinliang').textContent=calc(w,info,carriers.xinliang)||'--'; qs('p-shentong').textContent=calc(w,info,carriers.shentong)||'--'; qs('p-shunfeng').textContent=calc(w,info,carriers.shunfeng)||'--'; }
+      qs('address').addEventListener('input',update); qs('weight').addEventListener('input',update); qs('btn-clear').addEventListener('click',function(){qs('address').value=''; qs('weight').value=''; update();}); update();
+
+      function recalcPrice(){ var c=parseFloat(qs('cost').value)||0; var r=(parseFloat(qs('rate').value)||0)/100; var p=c*r; var s=c+p; qs('res-profit').textContent='利润: '+round2(p)+' RMB'; qs('res-sell').textContent='人民币售价: '+round2(s)+' RMB'; }
+      function recalcRate(){ var c=parseFloat(qs('rcost').value)||0; var p=parseFloat(qs('rprice').value)||0; var r=c?((p-c)/c*100):0; qs('res-rate').textContent='利润点: '+round2(r)+'%'; }
+      ['cost','rate'].forEach(function(id){var el=qs(id); if(el) el.addEventListener('input',recalcPrice)});
+      ['rcost','rprice'].forEach(function(id){var el=qs(id); if(el) el.addEventListener('input',recalcRate)});
+      recalcPrice(); recalcRate();
+    })();
+  </script>
+</body>
+</html>
