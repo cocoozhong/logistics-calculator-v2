@@ -7,7 +7,6 @@ import AddressInput from '@/components/AddressInput'
 import PriceResults from '@/components/PriceResults'
 import PageTitle from '@/components/PageTitle'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Truck, Calculator } from 'lucide-react'
 import Link from 'next/link'
 
@@ -76,29 +75,23 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* 导航栏 */}
+      {/* 导航栏 - 简化结构避免静态生成问题 */}
       <div className="flex justify-center pt-4 md:pt-8 pb-2 md:pb-4">
         <div className="flex bg-white rounded-lg p-1 shadow-sm border w-full max-w-sm">
-          <Button 
-            asChild
-            variant="default" 
-            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
+          <Link 
+            href="/"
+            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md font-medium transition-colors"
           >
-            <Link href="/">
-              <Truck className="h-3 w-3 md:h-4 md:w-4" />
-              <span>物流计算器</span>
-            </Link>
-          </Button>
-          <Button 
-            asChild
-            variant="ghost" 
-            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
+            <Truck className="h-3 w-3 md:h-4 md:w-4" />
+            <span>物流计算器</span>
+          </Link>
+          <Link 
+            href="/profit"
+            className="flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-md font-medium transition-colors"
           >
-            <Link href="/profit">
-              <Calculator className="h-3 w-3 md:h-4 md:w-4" />
-              <span>利润计算器</span>
-            </Link>
-          </Button>
+            <Calculator className="h-3 w-3 md:h-4 md:w-4" />
+            <span>利润计算器</span>
+          </Link>
         </div>
       </div>
 
