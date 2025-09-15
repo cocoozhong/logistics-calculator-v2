@@ -38,12 +38,14 @@ jobs:
       
     - name: Deploy to gh-pages
       run: |
+        # Copy build output to temp location
+        cp -r out /tmp/build-output
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git fetch origin gh-pages || true
         git checkout -b gh-pages origin/gh-pages || git checkout gh-pages
         rm -rf *
-        cp -r /home/runner/work/logistics-calculator-v2/logistics-calculator-v2/out/* .
+        cp -r /tmp/build-output/* .
         git add .
         git commit -m "Deploy from main branch" || exit 0
         git push origin gh-pages
