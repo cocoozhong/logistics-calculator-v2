@@ -5,6 +5,7 @@ import { calculatePrices } from '@/lib/price-calculator'
 import { PriceResult, ParsedAddress, InputMode, CalculatorType } from '@/lib/types'
 import AddressInput from '@/components/AddressInput'
 import PriceResults from '@/components/PriceResults'
+import PageTitle from '@/components/PageTitle'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Truck, Calculator } from 'lucide-react'
@@ -101,11 +102,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 页面标题 - 确保部署时显示 */}
-      <div className="text-center mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">智能物流费用计算工具</h1>
-        <p className="text-sm md:text-base text-gray-600">多物流公司价格对比，智能地址解析，移动端优化</p>
-      </div>
+      {/* 页面标题 - 使用独立组件确保部署时显示 */}
+      <PageTitle />
 
       {/* 主要内容 */}
       <main className="container mx-auto px-3 md:px-4 py-2 md:py-4">
