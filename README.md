@@ -23,7 +23,7 @@
 
 ## 📱 在线使用
 
-访问地址：https://cocoozhong.github.io/logistics-calculator
+访问地址：https://cocoozhong.github.io/logistics-calculator-v2
 
 ## 🛠️ 本地开发
 
