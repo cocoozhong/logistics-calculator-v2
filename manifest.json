@@ -2,19 +2,19 @@
   "name": "智能物流费用计算工具",
   "short_name": "物流计算器",
   "description": "专业的物流费用计算工具，支持多物流公司价格对比",
-  "start_url": "/ship/",
+  "start_url": "/logistics-calculator-v2/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/ship/icon-192.png",
+      "src": "/logistics-calculator-v2/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/ship/icon-512.png",
+      "src": "/logistics-calculator-v2/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
