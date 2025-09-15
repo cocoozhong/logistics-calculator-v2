@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Truck, Calculator } from 'lucide-react'
 import Link from 'next/link'
 
-// Force redeploy to fix UI display - Final fix
+// Force redeploy to fix UI display - Clear GitHub Pages cache completely
 export default function HomePage() {
   const [province, setProvince] = useState('')
   const [city, setCity] = useState('')
