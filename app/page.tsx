@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Truck, Calculator } from 'lucide-react'
 import Link from 'next/link'
 
-// Fresh deployment to new repository - logistics-calculator-v2
+// Fresh deployment to new repository - logistics-calculator-v2 - Trigger deployment
 export default function HomePage() {
   const [province, setProvince] = useState('')
   const [city, setCity] = useState('')
