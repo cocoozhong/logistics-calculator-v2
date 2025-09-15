@@ -43,7 +43,7 @@ jobs:
         git fetch origin gh-pages || true
         git checkout -b gh-pages origin/gh-pages || git checkout gh-pages
         rm -rf *
-        cp -r ../out/* .
+        cp -r /home/runner/work/logistics-calculator-v2/logistics-calculator-v2/out/* .
         git add .
         git commit -m "Deploy from main branch" || exit 0
         git push origin gh-pages
