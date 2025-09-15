@@ -42,8 +42,8 @@ jobs:
         cp -r out /tmp/build-output
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git fetch origin gh-pages || true
-        git checkout -b gh-pages origin/gh-pages || git checkout gh-pages
+        # Create gh-pages branch if it doesn't exist
+        git checkout --orphan gh-pages || git checkout gh-pages
         # Remove all files except .git
         find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
         # Copy only the build output files
