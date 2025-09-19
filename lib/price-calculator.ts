@@ -2,6 +2,8 @@ import { PriceResult, ExpressCompany } from './types'
 import pricesData from '../prices_updated.json'
 import sfData from '../data/sf_wuxi.json'
 import shentongData from '../data/shentong.json'
+import annengData from '../anneng_logistics.json'
+import { normalizeProvince, normalizeCity, fuzzyMatchCity } from './name-normalizer'
 
 /**
  * 计算物流费用
@@ -49,6 +51,32 @@ export function calculatePrices(province: string, city: string, weight: number):
       note: shentongResult.note
     })
   }
+
+  // 计算安能标准（按城市优先，其次省份，按重量单价）
+  const annengStd = calculateAnnengPriceWithDetail('standard', province, city, weight)
+  if (annengStd.price !== null) {
+    results.push({
+      company: '安能标准',
+      price: annengStd.price,
+      currency: 'CNY',
+      isCheapest: false,
+      note: annengStd.note,
+      leadTime: annengStd.leadTime
+    })
+  }
+
+  // 计算安能定时达
+  const annengTimed = calculateAnnengPriceWithDetail('timed', province, city, weight)
+  if (annengTimed.price !== null) {
+    results.push({
+      company: '安能定时达',
+      price: annengTimed.price,
+      currency: 'CNY',
+      isCheapest: false,
+      note: annengTimed.note,
+      leadTime: annengTimed.leadTime
+    })
+  }
   
   // 标记最便宜的价格
   if (results.length > 0) {
@@ -59,6 +87,27 @@ export function calculatePrices(province: string, city: string, weight: number):
   }
   
   return results.sort((a, b) => a.price - b.price)
+}
+
+/**
+ * 根据省份尝试多种键名获取区域配置
+ * 兼容：原始输入、省份标准化、标准化+“省”、标准化+“市”
+ */
+function getRegionByProvince(regions: any, province: string): any | null {
+  const original = province
+  const normalized = normalizeProvince(province)
+  const candidates = [
+    original,
+    normalized,
+    `${normalized}省`,
+    `${normalized}市`
+  ].filter(Boolean)
+  for (const key of candidates) {
+    if (regions && Object.prototype.hasOwnProperty.call(regions, key)) {
+      return regions[key]
+    }
+  }
+  return null
 }
 
 /**
@@ -108,7 +157,7 @@ function calculateXinliangPriceWithDetail(province: string, city: string, weight
  */
 function calculateSFPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
   try {
-    const regionData = (sfData.regions as any)[province]
+    const regionData = getRegionByProvince((sfData as any).regions, province)
     if (!regionData) {
       return { price: null, note: '该省份暂无数据' }
     }
@@ -138,7 +187,7 @@ function calculateSFPriceWithDetail(province: string, weight: number): { price: 
  */
 function calculateShentongPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
   try {
-    const regionData = (shentongData.regions as any)[province]
+    const regionData = getRegionByProvince((shentongData as any).regions, province)
     if (!regionData) {
       return { price: null, note: '该省份暂无数据' }
     }
@@ -160,6 +209,67 @@ function calculateShentongPriceWithDetail(province: string, weight: number): { p
   } catch (error) {
     console.error('计算申通价格失败:', error)
     return { price: null, note: '计算失败' }
+  }
+}
+
+/**
+ * 计算安能价格（标准/定时达）
+ * 数据来源：anneng_logistics.json -> tables.anneng / tables.anneng_timed
+ * 规则：优先按城市匹配，其次按省份匹配；计价=unit_price * weight；返回对应时效
+ */
+function calculateAnnengPriceWithDetail(
+  product: 'standard' | 'timed',
+  province: string,
+  city: string,
+  weight: number
+): { price: number | null, leadTime: string, note?: string } {
+  try {
+    // 安能业务规则：起运 15kg（低于按15kg计），最大 70kg（超过提示咨询）
+    if (weight > 70) {
+      return { price: null, leadTime: '', note: '超过安能最大承运重量（≤70kg），请咨询物流商' }
+    }
+    const effectiveWeight = weight < 15 ? 15 : weight
+    const tableKey = product === 'standard' ? 'anneng' : 'anneng_timed'
+    const rows: any[] = (annengData as any).tables?.[tableKey] || []
+    if (!rows.length) {
+      return { price: null, leadTime: '', note: '暂无安能数据' }
+    }
+
+    const normalizedProvince = normalizeProvince(province)
+    const normalizedCity = normalizeCity(city)
+
+    // 城市优先匹配 - 使用模糊匹配
+    let matched = rows.find(row => {
+      if (!Array.isArray(row.cities)) return false
+      return row.cities.some((c: string) => fuzzyMatchCity(normalizedCity, c))
+    })
+
+    // 省份兜底匹配 - 使用标准化匹配
+    if (!matched) {
+      matched = rows.find(row => {
+        if (!row.province) return false
+        const rowProvince = normalizeProvince(row.province)
+        return rowProvince === normalizedProvince
+      })
+    }
+
+    if (!matched) {
+      return { price: null, leadTime: '', note: '该地区暂无安能报价' }
+    }
+
+    const unit = Number(matched.unit_price)
+    if (!unit || weight <= 0) {
+      return { price: null, leadTime: '', note: '参数不完整' }
+    }
+
+    const price = unit * effectiveWeight
+    const leadTime = matched.time || ''
+    const scope = matched.cities?.some((c: string) => fuzzyMatchCity(normalizedCity, c)) ? '城市精确' : '省份参考'
+    const extra = weight < 15 ? '（起运按15kg计）' : ''
+    return { price, leadTime, note: `安能${product === 'standard' ? '标准' : '定时达'} · ${scope}报价${extra}` }
+  } catch (error) {
+    console.error('计算安能价格失败:', error)
+    return { price: null, leadTime: '', note: '计算失败' }
   }
 }
 

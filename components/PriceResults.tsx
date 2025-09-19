@@ -31,11 +31,13 @@ export default function PriceResults({ results, weight, province, city, hasError
     }
   }
 
-  // 三家公司的基础信息
+  // 五家物流公司的基础信息（快递用线隔开）
   const companies = [
-    { name: '新亮物流', key: 'xinliang' },
-    { name: '申通快递', key: 'shentong' },
-    { name: '顺丰快递', key: 'sf' }
+    { name: '申通快递', key: 'shentong', type: 'express' },
+    { name: '顺丰快递', key: 'sf', type: 'express' },
+    { name: '新亮物流', key: 'xinliang', type: 'logistics' },
+    { name: '安能标准', key: 'anneng_std', type: 'logistics' },
+    { name: '安能定时达', key: 'anneng_timed', type: 'logistics' }
   ]
 
   // 获取对应公司的价格结果
@@ -47,7 +49,7 @@ export default function PriceResults({ results, weight, province, city, hasError
   const cheapestResult = results.find(r => r.isCheapest)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 错误提示 */}
       {hasError && (
         <Card className="border-red-200 bg-red-50">
@@ -73,94 +75,100 @@ export default function PriceResults({ results, weight, province, city, hasError
         </Card>
       )}
 
-      {/* 三家公司价格卡片 */}
-      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-        {companies.map((company, index) => {
-          const result = getCompanyResult(company.name)
-          const isCheapest = result?.isCheapest
-          const hasResult = !!result
-          
-          return (
-            <Card
-              key={company.key}
-              className={`relative transition-all duration-300 hover:shadow-lg ${
-                isCheapest
-                  ? 'border-green-500 bg-green-50 shadow-lg scale-105'
-                  : 'border-gray-200 hover:border-gray-300'
-              } ${!hasResult ? 'opacity-50' : ''}`}
-            >
-              {isCheapest && (
-                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <Star className="h-3 w-3" />
-                  最便宜
-                </div>
-              )}
-              
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  {company.name}
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent className="space-y-3">
-                <div className="text-center">
-                  {hasResult ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className={`text-3xl font-bold ${
-                        isCheapest ? 'text-green-600' : 'text-gray-900'
-                      }`}>
-                        {formatPrice(result.price)}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(formatPrice(result.price), index)}
-                        className="h-8 w-8 p-0"
-                      >
-                        {copiedIndex === index ? (
-                          <Check className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="text-3xl font-bold text-gray-400">
-                      --
+      {/* 价格卡片 - 单排布局 */}
+      <div className="space-y-3">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          {companies.map((company, index) => {
+            const result = getCompanyResult(company.name)
+            const isCheapest = result?.isCheapest
+            const hasResult = !!result
+            const isExpress = company.type === 'express'
+            
+            return (
+              <div key={company.key} className="relative">
+                {/* 分隔符：快递和物流之间 */}
+                {index === 2 && (
+                  <div className="absolute -left-1.5 top-1/2 transform -translate-y-1/2 w-0.5 h-8 bg-gray-300"></div>
+                )}
+                
+                <Card
+                  className={`relative transition-all duration-200 ${
+                    isCheapest ? 'border-green-500 bg-green-50' : 'border-gray-200'
+                  } ${!hasResult ? 'opacity-60' : ''}`}
+                >
+                  {isCheapest && (
+                    <div className="absolute -top-2 -right-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                      <Star className="h-3 w-3" />最便宜
                     </div>
                   )}
-                  <div className="text-sm text-gray-500">CNY</div>
-                </div>
-                
-                {hasResult && result.leadTime && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4" />
-                    <span>配送时效：{result.leadTime}</span>
-                  </div>
-                )}
-                
-                {hasResult && weight > 0 && (
-                  <div className="text-xs text-gray-500">
-                    单价：{formatPrice(result.price / weight)}/kg
-                  </div>
-                )}
-                
-                {hasResult && result.note && (
-                  <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded mt-2">
-                    {result.note}
-                  </div>
-                )}
-                
-                {!hasResult && (
-                  <div className="text-sm text-gray-400 text-center">
-                    请先输入地址和重量
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )
-        })}
+                  
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Truck className="h-3.5 w-3.5" />
+                      {company.name}
+                    </CardTitle>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-1.5">
+                    <div className="text-center">
+                      {hasResult ? (
+                        <div className="flex items-center justify-center gap-1.5">
+                          <div className={`text-xl font-bold ${
+                            isCheapest ? 'text-green-600' : 'text-gray-900'
+                          }`}>
+                            {formatPrice(result.price)}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(formatPrice(result.price), index)}
+                            className="h-6 w-6 p-0"
+                          >
+                            {copiedIndex === index ? (
+                              <Check className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-xl font-bold text-gray-400">
+                          --
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500">CNY</div>
+                    </div>
+                    
+                    {hasResult && result.leadTime && (
+                      <div className="flex items-center gap-1 text-[10px] text-gray-600">
+                        <Clock className="h-3 w-3" />
+                        <span>{result.leadTime}</span>
+                      </div>
+                    )}
+                    
+                    {hasResult && weight > 0 && (
+                      <div className="text-[10px] text-gray-500">
+                        {formatPrice(result.price / weight)}/kg
+                      </div>
+                    )}
+                    
+                    {hasResult && result.note && (
+                      <div className="text-[10px] text-blue-600 bg-blue-50 p-1 rounded">
+                        {result.note}
+                      </div>
+                    )}
+                    
+                    {!hasResult && (
+                      <div className="text-[10px] text-gray-400 text-center">
+                        请先输入地址和重量
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

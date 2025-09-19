@@ -74,8 +74,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* 导航栏 - 简化结构避免静态生成问题 */}
-      <div className="flex justify-center pt-4 md:pt-8 pb-2 md:pb-4">
+      {/* 顶部导航 */}
+      <div className="flex justify-center pt-3 md:pt-4 pb-2">
         <div className="flex bg-white rounded-lg p-1 shadow-sm border w-full max-w-sm">
           <Link 
             href="/"
@@ -94,15 +94,14 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 页面标题 - 直接硬编码确保部署时显示 */}
-      <div className="text-center mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">智能物流费用计算工具</h1>
-        <p className="text-sm md:text-base text-gray-600">多物流公司价格对比，智能地址解析，移动端优化</p>
+      {/* 顶部站点名 */}
+      <div className="text-center mb-3 md:mb-4">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600">伟吉线槽计算工具</h1>
       </div>
 
       {/* 主要内容 */}
-      <main className="container mx-auto px-3 md:px-4 py-2 md:py-4">
-        <div className="max-w-4xl mx-auto space-y-4 md:space-y-8">
+      <main className="container mx-auto px-3 md:px-4 py-2">
+        <div className="max-w-5xl mx-auto space-y-3 md:space-y-4">
           {/* 输入表单 */}
           <AddressInput
             onAddressChange={handleAddressChange}

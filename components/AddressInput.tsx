@@ -72,6 +72,8 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   const [searchQuery, setSearchQuery] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
+  // 本地受控的重量输入字符串，避免被父级状态回写造成闪烁
+  const [weightInput, setWeightInput] = useState('')
 
   // 处理文字输入模式
   const handleTextInput = (value: string) => {
@@ -215,6 +217,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
 
   // 处理重量变化
   const handleWeightChange = (value: string) => {
+    setWeightInput(value)
     if (value === '') {
       // 允许清空
       onWeightChange(0)
@@ -229,6 +232,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   // 一键清除重量
   const clearWeight = () => {
     onWeightChange(0)
+    setWeightInput('')
   }
 
   // 清除所有输入
@@ -245,6 +249,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
     setShowSearchResults(false)
     setSearchQuery('')
     onWeightChange(0)
+    setWeightInput('')
     onAddressChange('', '', undefined)
     if (onClearAll) {
       onClearAll()
@@ -252,8 +257,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   }
 
   return (
-    <div className="space-y-6">
-      {/* 输入模式切换 */}
+    <div className="space-y-4">
       <Tabs value={mode} onValueChange={(value) => {
         setMode(value as InputMode)
         // 切换模式时清除所有内容
@@ -274,25 +278,29 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
           onModeChange(value as InputMode)
         }
       }} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="text" className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            文字输入
-          </TabsTrigger>
-          <TabsTrigger value="select" className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            选择模式
-          </TabsTrigger>
-        </TabsList>
-
         {/* 文字输入模式 */}
         <TabsContent value="text" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">智能地址解析</CardTitle>
-              <CardDescription>
-                直接粘贴包含姓名、电话、地址的完整信息，系统会自动解析
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">智能地址解析</CardTitle>
+                  <CardDescription>
+                    粘贴包含姓名、电话、地址的信息，系统自动解析
+                  </CardDescription>
+                </div>
+                {/* 输入模式切换按钮 */}
+                <TabsList className="grid grid-cols-2 h-7 text-xs">
+                  <TabsTrigger value="text" className="flex items-center gap-1 px-2">
+                    <Search className="h-3 w-3" />
+                    文字
+                  </TabsTrigger>
+                  <TabsTrigger value="select" className="flex items-center gap-1 px-2">
+                    <MapPin className="h-3 w-3" />
+                    选择
+                  </TabsTrigger>
+                </TabsList>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative">
@@ -300,7 +308,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
                   placeholder="例如：张三 13812345678 浙江省杭州市西湖区文三路123号"
                   value={textInput}
                   onChange={(e) => handleTextInput(e.target.value)}
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[80px] resize-none"
                 />
               </div>
               
@@ -345,15 +353,30 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
         <TabsContent value="select" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">精确地址选择</CardTitle>
-              <CardDescription>
-                直接在输入框中输入或选择省份和城市，支持智能搜索
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">精确地址选择</CardTitle>
+                  <CardDescription>
+                    输入或选择省份和城市，支持智能搜索
+                  </CardDescription>
+                </div>
+                {/* 输入模式切换按钮 */}
+                <TabsList className="grid grid-cols-2 h-7 text-xs">
+                  <TabsTrigger value="text" className="flex items-center gap-1 px-2">
+                    <Search className="h-3 w-3" />
+                    文字
+                  </TabsTrigger>
+                  <TabsTrigger value="select" className="flex items-center gap-1 px-2">
+                    <MapPin className="h-3 w-3" />
+                    选择
+                  </TabsTrigger>
+                </TabsList>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* 融合输入选择框 */}
               <div className="relative">
-                <label className="block text-sm font-medium mb-2">选择地址</label>
+                <label className="block text-sm font-medium mb-1">选择地址</label>
                 <div className="relative">
                   <Input
                     placeholder="输入或选择省份和城市..."
@@ -415,7 +438,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
               <Input
                 type="number"
                 placeholder="请输入重量"
-                value={weight > 0 ? weight.toString() : ''}
+                value={weightInput}
                 onChange={(e) => handleWeightChange(e.target.value)}
                 className="pr-10"
                 min="0.01"

@@ -56,56 +56,55 @@ export default function CalculationHistory({ onRecordClick, type }: CalculationH
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3 md:pb-6">
-        <CardTitle className="flex items-center justify-between text-lg md:text-xl">
-          <span className="text-sm md:text-base">{type === 'n-point' ? 'N点售价历史' : type === 'profit-point' ? '赚几个点历史' : '计算历史'}</span>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center justify-between text-lg">
+          <span className="text-sm">{type === 'n-point' ? 'N点售价历史' : type === 'profit-point' ? '赚几个点历史' : '计算历史'}</span>
           {history.length > 0 && (
             <Button
               size="sm"
               variant="outline"
               onClick={handleClearHistory}
-              className="h-7 md:h-8 text-xs md:text-sm"
+              className="h-6 text-xs"
             >
-              <Trash2 className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-              <span className="hidden sm:inline">清空</span>
+              <Trash2 className="h-3 w-3 mr-1" />
+              清空
             </Button>
           )}
         </CardTitle>
-        <CardDescription className="text-xs md:text-sm">
+        <CardDescription className="text-xs">
           最近的计算记录，点击可快速填入
         </CardDescription>
       </CardHeader>
       <CardContent>
         {history.length === 0 ? (
-          <div className="text-center text-gray-500 py-6 md:py-8 text-sm">
+          <div className="text-center text-gray-500 py-4 text-sm">
             暂无计算记录
           </div>
         ) : (
-          <div className="space-y-2 md:space-y-3">
+          <div className="space-y-2">
             {history.map((record, index) => (
               <div
                 key={record.id}
-                className="p-2 md:p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                className="p-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => onRecordClick?.(record)}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1 md:gap-2 mb-1">
+                    <div className="flex items-center gap-1 mb-1">
                       <Badge variant={record.type === 'n-point' ? 'default' : 'secondary'} className="text-xs">
                         #{index + 1}
                       </Badge>
-                      <span className="text-xs md:text-sm text-gray-600">
+                      <span className="text-xs text-gray-600">
                         {record.type === 'n-point' ? 'N点售价' : '赚几个点'}
                       </span>
                     </div>
-                    <div className="text-xs md:text-sm text-gray-800 break-words">
+                    <div className="text-xs text-gray-800 break-words">
                       {formatRecord(record)}
                     </div>
                   </div>
                   <div className="flex items-center text-xs text-gray-500 flex-shrink-0">
                     <Clock className="h-3 w-3 mr-1" />
-                    <span className="hidden sm:inline">{formatTime(record.timestamp)}</span>
-                    <span className="sm:hidden">{new Date(record.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span>{new Date(record.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
               </div>

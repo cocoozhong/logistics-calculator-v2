@@ -25,10 +25,10 @@ export default function ProfitCalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
-      <div className="container mx-auto px-3 md:px-4 max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         {/* 导航栏 */}
-        <div className="flex justify-center mb-6 md:mb-8">
+        <div className="flex justify-center pt-3 md:pt-4 pb-2">
           <div className="flex bg-white rounded-lg p-1 shadow-sm border w-full max-w-sm">
             <Button 
               asChild
@@ -53,34 +53,38 @@ export default function ProfitCalculatorPage() {
           </div>
         </div>
 
-        {/* 页面标题 */}
-        <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">利润计算器</h1>
-          <p className="text-sm md:text-base text-gray-600">智能计算产品利润和定价</p>
+        {/* 顶部站点名 */}
+        <div className="text-center mb-3 md:mb-4">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600">伟吉线槽计算工具</h1>
         </div>
 
-        {/* 主要内容区域 */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-          {/* 左侧：N点售价计算 */}
-          <div className="space-y-4 md:space-y-6">
-            <NPointCalculator onHistoryUpdate={handleHistoryUpdate} />
-            <CalculationHistory 
-              key={historyKey}
-              onRecordClick={handleRecordClick}
-              type="n-point"
-            />
-          </div>
+        {/* 主要内容 */}
+        <main className="container mx-auto px-3 md:px-4 py-2">
+          <div className="max-w-5xl mx-auto space-y-3 md:space-y-4">
+            {/* 主要内容区域 */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 md:gap-4">
+              {/* 左侧：N点售价计算 */}
+              <div className="space-y-3 md:space-y-4">
+                <NPointCalculator onHistoryUpdate={handleHistoryUpdate} />
+                <CalculationHistory 
+                  key={historyKey}
+                  onRecordClick={handleRecordClick}
+                  type="n-point"
+                />
+              </div>
 
-          {/* 右侧：赚几个点计算 */}
-          <div className="space-y-4 md:space-y-6">
-            <ProfitPointCalculator onHistoryUpdate={handleHistoryUpdate} />
-            <CalculationHistory 
-              key={historyKey}
-              onRecordClick={handleRecordClick}
-              type="profit-point"
-            />
+              {/* 右侧：赚几个点计算 */}
+              <div className="space-y-3 md:space-y-4">
+                <ProfitPointCalculator onHistoryUpdate={handleHistoryUpdate} />
+                <CalculationHistory 
+                  key={historyKey}
+                  onRecordClick={handleRecordClick}
+                  type="profit-point"
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   )

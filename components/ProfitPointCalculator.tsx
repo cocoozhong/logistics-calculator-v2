@@ -100,15 +100,15 @@ const ProfitPointCalculator = React.memo(function ProfitPointCalculator({ onHist
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3 md:pb-6">
-        <CardTitle className="text-green-600 text-lg md:text-xl">赚几个点</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-green-600 text-lg">赚几个点</CardTitle>
         <CardDescription className="text-sm">
           根据成本和售价反推利润率
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 md:space-y-4">
+      <CardContent className="space-y-3">
         {/* 输入区域 */}
-        <div className="space-y-3 md:space-y-4">
+        <div className="space-y-3">
           <div>
             <Label htmlFor="cost" className="text-sm">产品人民币成本:</Label>
             <Input
@@ -137,30 +137,30 @@ const ProfitPointCalculator = React.memo(function ProfitPointCalculator({ onHist
         </div>
 
         {/* 输出区域 - 一直显示 */}
-        <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t">
+        <div className="space-y-2 pt-3 border-t">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-medium flex-1 truncate">利润点: {outputs ? formatPrice(outputs.profitRate) : '0.00'}%</span>
             <Button
               size="sm"
               variant="outline"
               onClick={() => handleCopy(outputs ? formatPrice(outputs.profitRate) + '%' : '0.00%', 'profitRate')}
-              className="h-7 w-7 md:h-8 md:w-8 p-0 flex-shrink-0"
+              className="h-6 w-6 p-0 flex-shrink-0"
             >
-              <Copy className="h-3 w-3 md:h-4 md:w-4" />
+              <Copy className="h-3 w-3" />
             </Button>
           </div>
           
           {copySuccess && (
-            <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
+            <div className="text-xs text-green-600 bg-green-50 p-1 rounded">
               已复制到剪贴板
             </div>
           )}
         </div>
 
         {/* 操作按钮 */}
-        <div className="pt-4">
-          <Button onClick={handleClear} variant="outline" className="w-full">
-            <Trash2 className="h-4 w-4 mr-2" />
+        <div className="pt-3">
+          <Button onClick={handleClear} variant="outline" className="w-full h-8 text-sm">
+            <Trash2 className="h-3 w-3 mr-1" />
             清空
           </Button>
         </div>
