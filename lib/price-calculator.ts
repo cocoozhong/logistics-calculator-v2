@@ -1,415 +1,133 @@
-import { PriceResult, ExpressCompany } from './types'
-import pricesData from '../prices_updated.json'
-import sfData from '../data/sf_wuxi.json'
-import shentongData from '../data/shentong.json'
-import annengData from '../anneng_logistics.json'
-import { normalizeProvince, normalizeCity, fuzzyMatchCity } from './name-normalizer'
+// lib/price-calculator.ts
+import { PriceRule, PricingModel } from '@/types/pricing';
 
-/**
- * 计算物流费用
- * @param province 省份
- * @param city 城市
- * @param weight 重量(kg)
- * @returns 各物流公司价格结果
- */
-export function calculatePrices(province: string, city: string, weight: number): PriceResult[] {
-  const results: PriceResult[] = []
+// 进位函数
+function applyRounding(price: number, rounding?: 'up_to_0.2' | 'up_to_1' | 'none'): number {
+  if (!rounding || rounding === 'none') return price;
   
-  // 计算新亮物流价格（需要具体城市）
-  const xinliangResult = calculateXinliangPriceWithDetail(province, city, weight)
-  if (xinliangResult.price !== null) {
-    results.push({
-      company: '新亮物流',
-      price: xinliangResult.price,
-      currency: 'CNY',
-      leadTime: xinliangResult.leadTime,
-      isCheapest: false,
-      note: xinliangResult.note
-    })
+  switch (rounding) {
+    case 'up_to_0.2':
+      return Math.ceil(price * 5) / 5; // 向上进位到0.2
+    case 'up_to_1':
+      return Math.ceil(price); // 向上进位到整数
+    default:
+      return price;
   }
-  
-  // 计算顺丰价格（省份级别即可）
-  const sfResult = calculateSFPriceWithDetail(province, weight)
-  if (sfResult.price !== null) {
-    results.push({
-      company: '顺丰快递',
-      price: sfResult.price,
-      currency: 'CNY',
-      isCheapest: false,
-      note: sfResult.note
-    })
-  }
-  
-  // 计算申通价格（省份级别即可）
-  const shentongResult = calculateShentongPriceWithDetail(province, weight)
-  if (shentongResult.price !== null) {
-    results.push({
-      company: '申通快递',
-      price: shentongResult.price,
-      currency: 'CNY',
-      isCheapest: false,
-      note: shentongResult.note
-    })
-  }
-
-  // 计算安能标准（按城市优先，其次省份，按重量单价）
-  const annengStd = calculateAnnengPriceWithDetail('standard', province, city, weight)
-  if (annengStd.price !== null) {
-    results.push({
-      company: '安能标准',
-      price: annengStd.price,
-      currency: 'CNY',
-      isCheapest: false,
-      note: annengStd.note,
-      leadTime: annengStd.leadTime
-    })
-  }
-
-  // 计算安能定时达
-  const annengTimed = calculateAnnengPriceWithDetail('timed', province, city, weight)
-  if (annengTimed.price !== null) {
-    results.push({
-      company: '安能定时达',
-      price: annengTimed.price,
-      currency: 'CNY',
-      isCheapest: false,
-      note: annengTimed.note,
-      leadTime: annengTimed.leadTime
-    })
-  }
-  
-  // 标记最便宜的价格
-  if (results.length > 0) {
-    const minPrice = Math.min(...results.map(r => r.price))
-    results.forEach(result => {
-      result.isCheapest = result.price === minPrice
-    })
-  }
-  
-  return results.sort((a, b) => a.price - b.price)
 }
 
-/**
- * 根据省份尝试多种键名获取区域配置
- * 兼容：原始输入、省份标准化、标准化+“省”、标准化+“市”
- */
-function getRegionByProvince(regions: any, province: string): any | null {
-  const original = province
-  const normalized = normalizeProvince(province)
-  const candidates = [
-    original,
-    normalized,
-    `${normalized}省`,
-    `${normalized}市`
-  ].filter(Boolean)
-  for (const key of candidates) {
-    if (regions && Object.prototype.hasOwnProperty.call(regions, key)) {
-      return regions[key]
-    }
-  }
-  return null
-}
+export function calculatePrice(weight: number, rule: PriceRule): number {
+  if (weight <= 0) return 0;
+  if (!rule.ModelType) throw new Error('Missing pricing model type');
 
-/**
- * 计算新亮物流价格（智能版本）
- */
-function calculateXinliangPriceWithDetail(province: string, city: string, weight: number): { price: number | null, leadTime: string, note?: string } {
-  try {
-    const provinceData = (pricesData.data as any)[province]
-    if (!provinceData) {
-      return { price: null, leadTime: '', note: '该省份暂无数据' }
-    }
-    
-    // 如果有具体城市，优先使用城市数据
-    if (city && city.trim()) {
-      const cityData = (provinceData as any)[city]
-      if (cityData) {
-        const price = calculatePriceByWeight(cityData.rates, weight)
-        return { 
-          price, 
-          leadTime: cityData.lead_time_days || '',
-          note: `基于${city}的精确价格`
+  // 从规则中动态构建价格模型对象
+  const model: PricingModel = {
+    type: rule.ModelType!,
+    // @ts-ignore
+    minimumCharge: rule.MinimumCharge,
+    // @ts-ignore
+    tiers: rule.Tiers,
+    // @ts-ignore
+    firstWeightKg: rule.FirstWeightKg || 1,
+    // @ts-ignore
+    firstWeightPrice: rule.FirstWeightPrice,
+    // @ts-ignore
+    additionalWeightPricePerKg: rule.AdditionalWeightPricePerKg,
+    // @ts-ignore
+    exceptionThresholdKg: rule.ExceptionThresholdKg, // 新增
+    // @ts-ignore
+    exceptionFormula: rule.ExceptionFormula,   // 新增
+  };
+
+  switch (model.type) {
+    case 'first_additional':
+      if (!model.firstWeightPrice || !model.additionalWeightPricePerKg) return -1;
+
+      // *** 关键改动在这里：检查例外规则 ***
+      if (model.exceptionThresholdKg && weight >= model.exceptionThresholdKg) {
+        if (model.exceptionFormula === 'per_kg_only') {
+          // 如果满足例外条件，则不收首重，直接按续重单价算
+          return weight * model.additionalWeightPricePerKg;
         }
       }
-    }
-    
-    // 如果没有城市或城市不存在，使用省份参考价格
-    const cities = Object.keys(provinceData)
-    if (cities.length > 0) {
-      const cityData = (provinceData as any)[cities[0]]
-      const price = calculatePriceByWeight(cityData.rates, weight)
-      return { 
-        price, 
-        leadTime: cityData.lead_time_days || '',
-        note: `基于${cities[0]}的参考价格，请提供具体城市获得精确报价`
+
+      // 如果不满足例外条件，或者没有例外规则，就走标准的首重+续重逻辑
+      if (weight <= model.firstWeightKg) {
+        return model.firstWeightPrice;
       }
-    }
-    
-    return { price: null, leadTime: '', note: '暂无价格数据' }
-  } catch (error) {
-    console.error('计算新亮物流价格失败:', error)
-    return { price: null, leadTime: '', note: '计算失败' }
-  }
-}
+      const additionalWeight = Math.ceil(weight - model.firstWeightKg);
+      return model.firstWeightPrice + additionalWeight * model.additionalWeightPricePerKg;
 
-/**
- * 计算顺丰价格（智能版本）
- */
-function calculateSFPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
-  try {
-    const regionData = getRegionByProvince((sfData as any).regions, province)
-    if (!regionData) {
-      return { price: null, note: '该省份暂无数据' }
-    }
-    
-    const firstKg = regionData.first_kg
-    const additionalPerKg = regionData.additional_per_kg
-    
-    let price: number
-    if (weight <= 1) {
-      price = firstKg
-    } else {
-      price = firstKg + (weight - 1) * additionalPerKg
-    }
-    
-    return { 
-      price, 
-      note: '基于省份的统一价格'
-    }
-  } catch (error) {
-    console.error('计算顺丰价格失败:', error)
-    return { price: null, note: '计算失败' }
-  }
-}
-
-/**
- * 计算申通价格（智能版本）
- */
-function calculateShentongPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
-  try {
-    const regionData = getRegionByProvince((shentongData as any).regions, province)
-    if (!regionData) {
-      return { price: null, note: '该省份暂无数据' }
-    }
-    
-    const base = regionData.base
-    const extraPerKg = regionData.extra_per_kg
-    
-    let price: number
-    if (weight <= 1) {
-      price = base
-    } else {
-      price = base + (weight - 1) * extraPerKg
-    }
-    
-    return { 
-      price, 
-      note: '基于省份的统一价格'
-    }
-  } catch (error) {
-    console.error('计算申通价格失败:', error)
-    return { price: null, note: '计算失败' }
-  }
-}
-
-/**
- * 计算安能价格（标准/定时达）
- * 数据来源：anneng_logistics.json -> tables.anneng / tables.anneng_timed
- * 规则：优先按城市匹配，其次按省份匹配；计价=unit_price * weight；返回对应时效
- */
-function calculateAnnengPriceWithDetail(
-  product: 'standard' | 'timed',
-  province: string,
-  city: string,
-  weight: number
-): { price: number | null, leadTime: string, note?: string } {
-  try {
-    // 安能业务规则：起运 15kg（低于按15kg计），最大 70kg（超过提示咨询）
-    if (weight > 70) {
-      return { price: null, leadTime: '', note: '超过安能最大承运重量（≤70kg），请咨询物流商' }
-    }
-    const effectiveWeight = weight < 15 ? 15 : weight
-    const tableKey = product === 'standard' ? 'anneng' : 'anneng_timed'
-    const rows: any[] = (annengData as any).tables?.[tableKey] || []
-    if (!rows.length) {
-      return { price: null, leadTime: '', note: '暂无安能数据' }
-    }
-
-    const normalizedProvince = normalizeProvince(province)
-    const normalizedCity = normalizeCity(city)
-
-    // 城市优先匹配 - 使用模糊匹配
-    let matched = rows.find(row => {
-      if (!Array.isArray(row.cities)) return false
-      return row.cities.some((c: string) => fuzzyMatchCity(normalizedCity, c))
-    })
-
-    // 省份兜底匹配 - 使用标准化匹配
-    if (!matched) {
-      matched = rows.find(row => {
-        if (!row.province) return false
-        const rowProvince = normalizeProvince(row.province)
-        return rowProvince === normalizedProvince
-      })
-    }
-
-    if (!matched) {
-      return { price: null, leadTime: '', note: '该地区暂无安能报价' }
-    }
-
-    const unit = Number(matched.unit_price)
-    if (!unit || weight <= 0) {
-      return { price: null, leadTime: '', note: '参数不完整' }
-    }
-
-    const price = unit * effectiveWeight
-    const leadTime = matched.time || ''
-    const scope = matched.cities?.some((c: string) => fuzzyMatchCity(normalizedCity, c)) ? '城市精确' : '省份参考'
-    const extra = weight < 15 ? '（起运按15kg计）' : ''
-    return { price, leadTime, note: `安能${product === 'standard' ? '标准' : '定时达'} · ${scope}报价${extra}` }
-  } catch (error) {
-    console.error('计算安能价格失败:', error)
-    return { price: null, leadTime: '', note: '计算失败' }
-  }
-}
-
-/**
- * 根据重量档位计算价格
- */
-function calculatePriceByWeight(rates: any, weight: number): number | null {
-  if (weight <= 50) {
-    return rates['≤50kg'] || null
-  } else if (weight <= 200) {
-    return rates['50-200kg'] ? rates['50-200kg'] * weight : null
-  } else if (weight <= 500) {
-    return rates['200-500kg'] ? rates['200-500kg'] * weight : null
-  } else if (weight <= 1000) {
-    return rates['500-1000kg'] ? rates['500-1000kg'] * weight : null
-  } else if (weight <= 3000) {
-    return rates['1000-3000kg'] ? rates['1000-3000kg'] * weight : null
-  } else {
-    return rates['≥3000kg'] ? rates['≥3000kg'] * weight : null
-  }
-}
-
-/**
- * 计算新亮物流价格（原版本，保留兼容性）
- */
-function calculateXinliangPrice(province: string, city: string, weight: number): number | null {
-  try {
-    const provinceData = (pricesData.data as any)[province]
-    if (!provinceData) return null
-    
-    // 优先使用城市数据，如果没有则使用省份数据
-    let cityData = (provinceData as any)[city]
-    if (!cityData || city === '') {
-      // 如果城市不存在或为空，使用省份的参考数据
-      // 查找省份下的第一个城市作为参考
-      const cities = Object.keys(provinceData)
-      if (cities.length > 0) {
-        cityData = (provinceData as any)[cities[0]]
-        console.log(`使用省份 ${province} 的参考价格（基于 ${cities[0]}）`)
+    case 'tiered_minimum_charge':
+      if (!model.tiers || !model.minimumCharge) return -1;
+      
+      // 根据重量确定使用哪个价格区间
+      let selectedTier = null;
+      
+      for (const tier of model.tiers) {
+        if (tier.upToKg === null || weight <= tier.upToKg) {
+          selectedTier = tier;
+          break;
+        }
       }
-    }
-    
-    if (!cityData) return null
-    
-    const rates = cityData.rates
-    
-    // 根据重量选择价格档位
-    if (weight <= 50) {
-      // ≤50kg 是固定价格
-      return rates['≤50kg'] || null
-    } else if (weight <= 200) {
-      // 50-200kg 按重量计算
-      return rates['50-200kg'] ? rates['50-200kg'] * weight : null
-    } else if (weight <= 500) {
-      // 200-500kg 按重量计算
-      return rates['200-500kg'] ? rates['200-500kg'] * weight : null
-    } else if (weight <= 1000) {
-      // 500-1000kg 按重量计算
-      return rates['500-1000kg'] ? rates['500-1000kg'] * weight : null
-    } else if (weight <= 3000) {
-      // 1000-3000kg 按重量计算
-      return rates['1000-3000kg'] ? rates['1000-3000kg'] * weight : null
-    } else {
-      // ≥3000kg 按重量计算
-      return rates['≥3000kg'] ? rates['≥3000kg'] * weight : null
-    }
-  } catch (error) {
-    console.error('计算新亮物流价格失败:', error)
-    return null
-  }
-}
-
-/**
- * 计算顺丰价格
- */
-function calculateSFPrice(province: string, weight: number): number | null {
-  try {
-    const regionData = (sfData.regions as any)[province]
-    if (!regionData) return null
-    
-    const firstKg = regionData.first_kg
-    const additionalPerKg = regionData.additional_per_kg
-    
-    if (weight <= 1) {
-      return firstKg
-    } else {
-      return firstKg + (weight - 1) * additionalPerKg
-    }
-  } catch (error) {
-    console.error('计算顺丰价格失败:', error)
-    return null
-  }
-}
-
-/**
- * 计算申通价格
- */
-function calculateShentongPrice(province: string, weight: number): number | null {
-  try {
-    const regionData = (shentongData.regions as any)[province]
-    if (!regionData) return null
-    
-    const base = regionData.base
-    const extraPerKg = regionData.extra_per_kg
-    
-    if (weight <= 1) {
-      return base
-    } else {
-      return base + (weight - 1) * extraPerKg
-    }
-  } catch (error) {
-    console.error('计算申通价格失败:', error)
-    return null
-  }
-}
-
-/**
- * 获取配送时效
- */
-function getLeadTime(province: string, city: string): string {
-  try {
-    const provinceData = (pricesData.data as any)[province]
-    if (!provinceData) return ''
-    
-    // 优先使用城市数据，如果没有则使用省份数据
-    let cityData = (provinceData as any)[city]
-    if (!cityData || city === '') {
-      // 如果城市不存在或为空，使用省份下第一个城市的时效
-      const cities = Object.keys(provinceData)
-      if (cities.length > 0) {
-        cityData = (provinceData as any)[cities[0]]
+      
+      if (!selectedTier) return -1;
+      
+      let price = 0;
+      if (selectedTier.flatPrice) {
+        price = selectedTier.flatPrice;
+      } else if (selectedTier.pricePerKg) {
+        price = weight * selectedTier.pricePerKg;
       }
-    }
-    
-    if (!cityData) return ''
-    
-    return cityData.lead_time_days || ''
-  } catch (error) {
-    console.error('获取配送时效失败:', error)
-    return ''
+      
+      return Math.max(price, model.minimumCharge);
+
+    case 'complex_tiered':
+      if (!model.tiers) return -1;
+      
+      // 找到适合的重量区间
+      for (const tier of model.tiers) {
+        // 如果重量在这个区间内，使用这个区间的价格
+        if (tier.upToKg === null || weight <= tier.upToKg) {
+          if (tier.flatPrice) {
+            // 固定价格
+            return applyRounding(tier.flatPrice, model.rounding);
+          } else if (tier.pricePerKg) {
+            // 按重量计算
+            const price = tier.baseFee ? tier.baseFee + weight * tier.pricePerKg : weight * tier.pricePerKg;
+            return applyRounding(price, model.rounding);
+          }
+        }
+      }
+      
+      return -1; // 没有找到合适的区间
+
+    case 'first_plus_tiered_flat_rate':
+      if (!model.firstWeightPrice || !model.tiers) return -1;
+      
+      // 申通快递的特殊逻辑：
+      // 1kg内：首重价格
+      // 1.1kg开始：按区间价格
+      
+      // 如果重量小于等于首重，只收首重价格
+      if (weight <= model.firstWeightKg) {
+        return model.firstWeightPrice;
+      }
+      
+      // 超过首重的部分，按固定价格分段计算
+      // 这里的tiers是基于总重量的区间，不是基于超出部分的
+      for (const tier of model.tiers) {
+        if (tier.upToKg === null || weight <= tier.upToKg) {
+          if (tier.flatPrice) {
+            return tier.flatPrice; // 直接返回区间价格
+          }
+        }
+      }
+      
+      // 如果超过了所有区间的上限，返回-1（表示不接受）
+      return -1;
+
+    default:
+      throw new Error(`Unknown pricing model type: ${(model as any).type}`);
   }
 }
 

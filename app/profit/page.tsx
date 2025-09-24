@@ -55,7 +55,7 @@ export default function ProfitCalculatorPage() {
 
         {/* 顶部站点名 */}
         <div className="text-center mb-3 md:mb-4">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600">伟吉线槽计算工具</h1>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600">源星辅料计算工具</h1>
         </div>
 
         {/* 主要内容 */}

@@ -7,49 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { parseAddress, validateAddress, formatAddress } from '@/lib/address-parser'
-import { getAllProvinces, getCitiesByProvince, searchProvinceCity, getAllProvinceCityOptions } from '@/lib/province-city-data'
 import { ParsedAddress, InputMode } from '@/lib/types'
+import { Location } from '@/lib/loadLocations'
+import { matchLocation, parseAddressWithLocations } from '@/lib/location-matcher'
 import { Search, MapPin, User, Phone, CheckCircle, AlertCircle, X } from 'lucide-react'
 
-// 从输入中解析省份和城市
-function parseProvinceCityFromInput(input: string): { province: string; city: string } {
-  const provinces = [
-    '北京市', '天津市', '河北省', '山西省', '内蒙古', '辽宁省', '吉林省', '黑龙江省',
-    '上海市', '江苏省', '浙江省', '安徽省', '福建省', '江西省', '山东省', '河南省',
-    '湖北省', '湖南省', '广东省', '广西', '海南省', '重庆市', '四川省', '贵州省',
-    '云南省', '西藏', '陕西省', '甘肃省', '青海省', '宁夏', '新疆'
-  ]
-  
-  let province = ''
-  let city = ''
-  
-  // 查找省份
-  for (const prov of provinces) {
-    if (input.includes(prov)) {
-      province = prov
-      break
-    }
-  }
-  
-  // 如果找到省份，尝试提取城市
-  if (province) {
-    const afterProvince = input.substring(input.indexOf(province) + province.length).trim()
-    const words = afterProvince.split(/[\s，,]/).filter(word => word.length > 0)
-    
-    if (words.length > 0) {
-      const firstWord = words[0]
-      // 如果包含城市关键词，直接使用
-      if (firstWord.includes('市') || firstWord.includes('县') || firstWord.includes('区')) {
-        city = firstWord
-      } else if (firstWord.length >= 2 && firstWord.length <= 6) {
-        // 尝试添加"市"后缀
-        city = firstWord + '市'
-      }
-    }
-  }
-  
-  return { province, city }
-}
 
 interface AddressInputProps {
   onAddressChange: (province: string, city: string, parsedInfo?: ParsedAddress) => void
@@ -57,14 +19,16 @@ interface AddressInputProps {
   weight: number
   onClearAll?: () => void
   onModeChange?: (mode: InputMode) => void
+  disabled?: boolean
+  locations: Location[]
+  onTextAddressInput?: (textInput: string) => void
+  province?: string
+  city?: string
 }
 
-export default function AddressInput({ onAddressChange, onWeightChange, weight, onClearAll, onModeChange }: AddressInputProps) {
+export default function AddressInput({ onAddressChange, onWeightChange, weight, onClearAll, onModeChange, disabled = false, locations, onTextAddressInput, province, city }: AddressInputProps) {
   const [mode, setMode] = useState<InputMode>('text')
   const [textInput, setTextInput] = useState('')
-  const [selectedProvince, setSelectedProvince] = useState('')
-  const [selectedCity, setSelectedCity] = useState('')
-  const [selectedProvinceCity, setSelectedProvinceCity] = useState('')
   const [parsedAddress, setParsedAddress] = useState<ParsedAddress | null>(null)
   const [isValid, setIsValid] = useState(false)
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -78,43 +42,28 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   // 处理文字输入模式
   const handleTextInput = (value: string) => {
     setTextInput(value)
-    if (value.trim()) {
-      const parsed = parseAddress(value)
-      setParsedAddress(parsed)
-      // 智能解析：只要有省份就认为可以计算（城市可以为空）
-      const valid = !!(parsed.province)
-      setIsValid(valid)
-      
-      if (valid) {
-        onAddressChange(parsed.province, parsed.city, parsed)
-      }
-    } else {
-      setParsedAddress(null)
-      setIsValid(false)
+    if (onTextAddressInput) {
+      onTextAddressInput(value)
     }
   }
 
-  // 处理选择模式
-  const handleProvinceChange = (province: string) => {
-    setSelectedProvince(province)
-    setSelectedCity('')
-    if (province) {
-      onAddressChange(province, '', undefined)
-    }
-  }
-
-  const handleCityChange = (city: string) => {
-    setSelectedCity(city)
-    if (selectedProvince && city) {
-      onAddressChange(selectedProvince, city, undefined)
-    }
+  // 处理地点选择
+  const handleLocationSelect = (locationName: string) => {
+    onAddressChange(locationName, locationName, undefined)
   }
 
   // 处理搜索
   const handleSearch = (query: string) => {
     setSearchQuery(query)
     if (query.trim()) {
-      const results = searchProvinceCity(query)
+      // 使用地点数据进行搜索
+      const results = locations.filter(location => 
+        location.name.toLowerCase().includes(query.toLowerCase())
+      ).map(location => ({
+        province: location.name,
+        city: location.name,
+        name: location.name
+      }))
       setSearchResults(results)
       setShowSearchResults(true)
     } else {
@@ -124,32 +73,16 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   }
 
   const handleSearchSelect = (result: any) => {
-    if (result.city) {
-      setSelectedProvince(result.province)
-      setSelectedCity(result.city)
-      setSelectedProvinceCity(`${result.province} ${result.city}`)
-      onAddressChange(result.province, result.city, undefined)
-    } else {
-      setSelectedProvince(result.province)
-      setSelectedCity('')
-      setSelectedProvinceCity(result.province)
-      onAddressChange(result.province, '', undefined)
-    }
+    onAddressChange(result.name, result.name, undefined)
     setSearchQuery('')
     setShowSearchResults(false)
   }
 
-  // 处理省份+城市组合选择
-  const handleProvinceCityChange = (value: string) => {
-    setSelectedProvinceCity(value)
+  // 处理地点组合选择
+  const handleLocationChange = (value: string) => {
     if (value) {
-      const [province, city] = value.split(' ')
-      setSelectedProvince(province)
-      setSelectedCity(city || '')
-      onAddressChange(province, city || '', undefined)
+      onAddressChange(value, value, undefined)
     } else {
-      setSelectedProvince('')
-      setSelectedCity('')
       onAddressChange('', '', undefined)
     }
   }
@@ -160,40 +93,25 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
     setShowDropdown(true)
     
     if (value.trim()) {
-      // 搜索匹配的选项
-      const allOptions = getAllProvinceCityOptions()
-      const filteredOptions = allOptions.filter(option => 
-        option.fullName.toLowerCase().includes(value.toLowerCase()) ||
-        option.province.toLowerCase().includes(value.toLowerCase()) ||
-        option.city.toLowerCase().includes(value.toLowerCase())
+      // 使用传入的locations数据进行搜索，只搜索有计价规则的地点
+      const filteredLocations = locations.filter(location => 
+        location.pricingRules && location.pricingRules.length > 0 &&
+        location.name.toLowerCase().includes(value.toLowerCase())
       )
-      setSearchResults(filteredOptions) // 显示所有匹配结果
-      
-      // 智能解析：尝试从输入中提取省份和城市
-      const { province, city } = parseProvinceCityFromInput(value)
-      if (province) {
-        setSelectedProvince(province)
-        setSelectedCity(city || '')
-        onAddressChange(province, city || '', undefined)
-      }
+      setSearchResults(filteredLocations.map(loc => ({ name: loc.name })))
     } else {
       setSearchResults([])
       setShowDropdown(false)
-      setSelectedProvince('')
-      setSelectedCity('')
       onAddressChange('', '', undefined)
     }
   }
 
   // 选择选项
   const handleOptionSelect = (option: any) => {
-    setInputValue(option.fullName)
-    setSelectedProvince(option.province)
-    setSelectedCity(option.city)
-    setSelectedProvinceCity(option.fullName)
+    setInputValue(option.name)
     setShowDropdown(false)
     setSearchResults([])
-    onAddressChange(option.province, option.city, undefined)
+    onAddressChange(option.name, option.name, undefined)
   }
 
   // 处理输入框焦点
@@ -201,8 +119,9 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
     if (inputValue.trim()) {
       setShowDropdown(true)
     } else {
-      // 如果没有输入内容，显示所有选项
-      setSearchResults(getAllProvinceCityOptions())
+      // 如果没有输入内容，显示所有有计价规则的地点
+      const locationsWithRules = locations.filter(loc => loc.pricingRules && loc.pricingRules.length > 0)
+      setSearchResults(locationsWithRules.map(loc => ({ name: loc.name })))
       setShowDropdown(true)
     }
   }
@@ -238,9 +157,6 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   // 清除所有输入
   const clearAll = () => {
     setTextInput('')
-    setSelectedProvince('')
-    setSelectedCity('')
-    setSelectedProvinceCity('')
     setInputValue('')
     setShowDropdown(false)
     setParsedAddress(null)
@@ -262,9 +178,6 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
         setMode(value as InputMode)
         // 切换模式时清除所有内容
         setTextInput('')
-        setSelectedProvince('')
-        setSelectedCity('')
-        setSelectedProvinceCity('')
         setInputValue('')
         setShowDropdown(false)
         setParsedAddress(null)
@@ -284,18 +197,18 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg">智能地址解析</CardTitle>
+                  <CardTitle className="text-lg">地址输入</CardTitle>
                   <CardDescription>
-                    粘贴包含姓名、电话、地址的信息，系统自动解析
+                    请输入地址，越详尽越好
                   </CardDescription>
                 </div>
                 {/* 输入模式切换按钮 */}
-                <TabsList className="grid grid-cols-2 h-7 text-xs">
-                  <TabsTrigger value="text" className="flex items-center gap-1 px-2">
+                <TabsList className={`grid grid-cols-2 h-7 text-xs ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <TabsTrigger value="text" className="flex items-center gap-1 px-2" disabled={disabled}>
                     <Search className="h-3 w-3" />
                     文字
                   </TabsTrigger>
-                  <TabsTrigger value="select" className="flex items-center gap-1 px-2">
+                  <TabsTrigger value="select" className="flex items-center gap-1 px-2" disabled={disabled}>
                     <MapPin className="h-3 w-3" />
                     选择
                   </TabsTrigger>
@@ -305,12 +218,24 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
             <CardContent className="space-y-4">
               <div className="relative">
                 <Textarea
-                  placeholder="例如：张三 13812345678 浙江省杭州市西湖区文三路123号"
+                  placeholder="请输入地址，越详尽越好"
                   value={textInput}
                   onChange={(e) => handleTextInput(e.target.value)}
                   className="min-h-[80px] resize-none"
+                  disabled={disabled}
                 />
               </div>
+              
+              {/* 地址解析结果显示 */}
+              {(province || city) && (
+                <div className="text-xs text-gray-500 text-center">
+                  {province && city && province === city ? (
+                    <span>解析结果：{province}</span>
+                  ) : (
+                    <span>解析结果：{province && `省份：${province}`}{province && city && '，'}{city && `城市：${city}`}</span>
+                  )}
+                </div>
+              )}
               
               {parsedAddress && (
                 <div className="space-y-2">
@@ -361,12 +286,12 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
                   </CardDescription>
                 </div>
                 {/* 输入模式切换按钮 */}
-                <TabsList className="grid grid-cols-2 h-7 text-xs">
-                  <TabsTrigger value="text" className="flex items-center gap-1 px-2">
+                <TabsList className={`grid grid-cols-2 h-7 text-xs ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <TabsTrigger value="text" className="flex items-center gap-1 px-2" disabled={disabled}>
                     <Search className="h-3 w-3" />
                     文字
                   </TabsTrigger>
-                  <TabsTrigger value="select" className="flex items-center gap-1 px-2">
+                  <TabsTrigger value="select" className="flex items-center gap-1 px-2" disabled={disabled}>
                     <MapPin className="h-3 w-3" />
                     选择
                   </TabsTrigger>
@@ -379,7 +304,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
                 <label className="block text-sm font-medium mb-1">选择地址</label>
                 <div className="relative">
                   <Input
-                    placeholder="输入或选择省份和城市..."
+                    placeholder="搜索或选择地点..."
                     value={inputValue}
                     onChange={(e) => handleInputChange(e.target.value)}
                     onFocus={handleInputFocus}
@@ -400,7 +325,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
                           onClick={() => handleOptionSelect(result)}
                           className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:outline-none focus:bg-gray-50"
                         >
-                          <div className="font-medium">{result.fullName}</div>
+                          <div className="font-medium">{result.name}</div>
                         </button>
                       ))}
                     </div>
@@ -440,9 +365,11 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
                 placeholder="请输入重量"
                 value={weightInput}
                 onChange={(e) => handleWeightChange(e.target.value)}
+                onWheel={(e) => e.currentTarget.blur()}
                 className="pr-10"
                 min="0.01"
                 step="0.1"
+                disabled={disabled}
               />
               {weight > 0 && (
                 <Button

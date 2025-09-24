@@ -25,6 +25,8 @@
 
 访问地址：https://cocoozhong.github.io/logistics-calculator-v2
 
+> 💡 **新部署方式**：项目现已支持 Cloudflare Pages 部署，提供更快的全球 CDN 访问速度和更好的性能。详细部署指南请参考 [Cloudflare Pages 部署文档](./CLOUDFLARE_DEPLOYMENT.md)
+
 ## 🛠️ 本地开发
 
 ### 环境要求
@@ -45,16 +47,32 @@ npm run dev
 
 ### 构建生产版本
 ```bash
+# 构建静态版本（用于 Cloudflare Pages）
+npm run build:static
+
+# 或传统构建方式
 npm run build
-npm run export
+npm run start
+```
+
+### 本地预览静态版本
+```bash
+npm run build:static
+npm run preview
 ```
 
 ## 📊 数据说明
 
+### 数据源
+- **Airtable 集成**：所有物流价格数据从 Airtable 动态获取
+- **实时更新**：支持在线更新价格，无需重新部署
+- **多物流公司**：顺丰快递、申通快递、新亮物流、安能标准、安能定时达
+
 ### 物流公司数据
-- **顺丰快递**：基于无锡发货的首重+续重模式
+- **顺丰快递**：基于省份的首重+续重模式
 - **申通快递**：基础价格+每公斤加价模式
 - **新亮物流**：按重量区间定价模式
+- **安能物流**：按重量单价计算，支持标准件和定时达
 
 ### 地址解析
 - 支持省市区三级地址解析
@@ -67,7 +85,17 @@ npm run export
 - **语言**：TypeScript
 - **样式**：Tailwind CSS
 - **UI组件**：Shadcn-ui
-- **部署**：GitHub Pages
+- **数据源**：Airtable API
+- **部署**：Cloudflare Pages / GitHub Pages / Vercel
+
+## 🔗 Airtable 集成
+
+本项目已集成 Airtable 作为数据源，支持：
+- 动态价格数据管理
+- 实时数据更新
+- 无需重新部署即可更新价格
+
+详细配置说明请参考：[Airtable 集成指南](./AIRTABLE_INTEGRATION.md)
 
 ## 📝 使用说明
 

@@ -1,5 +1,5 @@
 // 物流公司类型
-export type ExpressCompany = '顺丰快递' | '申通快递' | '新亮物流' | '安能标准' | '安能定时达'
+export type ExpressCompany = '顺丰快递' | '申通快递' | '新亮物流' | '安能标准' | '安能定时达' | string
 
 // 地址信息类型
 export interface AddressInfo {

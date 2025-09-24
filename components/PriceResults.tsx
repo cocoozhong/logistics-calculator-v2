@@ -31,14 +31,23 @@ export default function PriceResults({ results, weight, province, city, hasError
     }
   }
 
-  // 五家物流公司的基础信息（快递用线隔开）
-  const companies = [
-    { name: '申通快递', key: 'shentong', type: 'express' },
-    { name: '顺丰快递', key: 'sf', type: 'express' },
-    { name: '新亮物流', key: 'xinliang', type: 'logistics' },
-    { name: '安能标准', key: 'anneng_std', type: 'logistics' },
-    { name: '安能定时达', key: 'anneng_timed', type: 'logistics' }
-  ]
+  // 固定的8家物流公司列表
+  const getAllCompanies = () => {
+    const allCompanies = [
+      { name: '顺心捷达', key: 'shunxinjieda', type: 'logistics' },
+      { name: '融辉物流', key: 'ronghuilogistics', type: 'logistics' },
+      { name: '德邦快递', key: 'debangkuaidi', type: 'express' },
+      { name: '安能', key: 'anneng', type: 'logistics' },
+      { name: '安能定时达', key: 'annengdingshida', type: 'logistics' },
+      { name: '百世快运', key: 'baishikuaidi', type: 'express' },
+      { name: '申通快递', key: 'shentongkuaidi', type: 'express' },
+      { name: '中通快递', key: 'zhongtongkuaidi', type: 'express' }
+    ]
+    
+    return allCompanies
+  }
+
+  const companies = getAllCompanies()
 
   // 获取对应公司的价格结果
   const getCompanyResult = (companyName: string) => {
@@ -75,21 +84,17 @@ export default function PriceResults({ results, weight, province, city, hasError
         </Card>
       )}
 
-      {/* 价格卡片 - 单排布局 */}
-      <div className="space-y-3">
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          {companies.map((company, index) => {
-            const result = getCompanyResult(company.name)
-            const isCheapest = result?.isCheapest
-            const hasResult = !!result
-            const isExpress = company.type === 'express'
-            
-            return (
-              <div key={company.key} className="relative">
-                {/* 分隔符：快递和物流之间 */}
-                {index === 2 && (
-                  <div className="absolute -left-1.5 top-1/2 transform -translate-y-1/2 w-0.5 h-8 bg-gray-300"></div>
-                )}
+      {/* 价格卡片 - 固定8家公司布局 */}
+      <div className="space-y-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2">
+            {companies.map((company, index) => {
+              const result = getCompanyResult(company.name)
+              const isCheapest = result?.isCheapest
+              const hasResult = !!result
+              const isExpress = company.type === 'express'
+              
+              return (
+                <div key={company.key} className="relative">
                 
                 <Card
                   className={`relative transition-all duration-200 ${
@@ -102,18 +107,18 @@ export default function PriceResults({ results, weight, province, city, hasError
                     </div>
                   )}
                   
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Truck className="h-3.5 w-3.5" />
+                  <CardHeader className="pb-1">
+                    <CardTitle className="text-xs flex items-center gap-1">
+                      <Truck className="h-3 w-3" />
                       {company.name}
                     </CardTitle>
                   </CardHeader>
                   
-                  <CardContent className="space-y-1.5">
+                  <CardContent className="space-y-1">
                     <div className="text-center">
                       {hasResult ? (
-                        <div className="flex items-center justify-center gap-1.5">
-                          <div className={`text-xl font-bold ${
+                        <div className="flex items-center justify-center gap-1">
+                          <div className={`text-lg font-bold ${
                             isCheapest ? 'text-green-600' : 'text-gray-900'
                           }`}>
                             {formatPrice(result.price)}
@@ -122,45 +127,40 @@ export default function PriceResults({ results, weight, province, city, hasError
                             variant="ghost"
                             size="sm"
                             onClick={() => copyToClipboard(formatPrice(result.price), index)}
-                            className="h-6 w-6 p-0"
+                            className="h-5 w-5 p-0"
                           >
                             {copiedIndex === index ? (
-                              <Check className="h-3 w-3 text-green-600" />
+                              <Check className="h-2.5 w-2.5 text-green-600" />
                             ) : (
-                              <Copy className="h-3 w-3" />
+                              <Copy className="h-2.5 w-2.5" />
                             )}
                           </Button>
                         </div>
                       ) : (
-                        <div className="text-xl font-bold text-gray-400">
+                        <div className="text-lg font-bold text-gray-400">
                           --
                         </div>
                       )}
-                      <div className="text-xs text-gray-500">CNY</div>
+                      <div className="text-[10px] text-gray-500">CNY</div>
                     </div>
                     
                     {hasResult && result.leadTime && (
-                      <div className="flex items-center gap-1 text-[10px] text-gray-600">
-                        <Clock className="h-3 w-3" />
+                      <div className="flex items-center gap-1 text-[9px] text-gray-600">
+                        <Clock className="h-2.5 w-2.5" />
                         <span>{result.leadTime}</span>
                       </div>
                     )}
                     
                     {hasResult && weight > 0 && (
-                      <div className="text-[10px] text-gray-500">
+                      <div className="text-[9px] text-gray-500">
                         {formatPrice(result.price / weight)}/kg
                       </div>
                     )}
                     
-                    {hasResult && result.note && (
-                      <div className="text-[10px] text-blue-600 bg-blue-50 p-1 rounded">
-                        {result.note}
-                      </div>
-                    )}
                     
                     {!hasResult && (
-                      <div className="text-[10px] text-gray-400 text-center">
-                        请先输入地址和重量
+                      <div className="text-[9px] text-gray-400 text-center">
+                        暂无价格数据
                       </div>
                     )}
                   </CardContent>
@@ -169,6 +169,7 @@ export default function PriceResults({ results, weight, province, city, hasError
             )
           })}
         </div>
+
       </div>
     </div>
   )
