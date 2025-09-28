@@ -148,7 +148,10 @@ export default function PriceResults({ results, weight, province, city, hasError
                     
                     {hasResult && weight > 0 && (
                       <div className="text-[10px] text-gray-500">
-                        {formatPrice(result.price / weight)}/kg
+                        {result.company.includes('安能') 
+                          ? `${formatPrice((result.price - 5) / weight)}/kg` 
+                          : `${formatPrice(result.price / weight)}/kg`
+                        }
                       </div>
                     )}
                     

@@ -3,6 +3,10 @@
  * 处理各种行政区划后缀，确保与数据源匹配
  */
 
+// 缓存标准化结果，提升性能
+const normalizeCache = new Map<string, string>()
+const CACHE_LIMIT = 200
+
 // 省份标准化映射
 const PROVINCE_NORMALIZE_MAP: { [key: string]: string } = {
   // 直辖市
@@ -95,20 +99,35 @@ export function normalizeProvince(province: string): string {
   
   const trimmed = province.trim()
   
+  // 检查缓存
+  if (normalizeCache.has(trimmed)) {
+    return normalizeCache.get(trimmed)!
+  }
+  
+  let result: string
+  
   // 直接映射
   if (PROVINCE_NORMALIZE_MAP[trimmed]) {
-    return PROVINCE_NORMALIZE_MAP[trimmed]
-  }
-  
-  // 模糊匹配
-  for (const [key, value] of Object.entries(PROVINCE_NORMALIZE_MAP)) {
-    if (key.includes(trimmed) || trimmed.includes(key)) {
-      return value
+    result = PROVINCE_NORMALIZE_MAP[trimmed]
+  } else {
+    // 模糊匹配
+    for (const [key, value] of Object.entries(PROVINCE_NORMALIZE_MAP)) {
+      if (key.includes(trimmed) || trimmed.includes(key)) {
+        result = value
+        break
+      }
     }
+    result = result || trimmed
   }
   
-  // 如果都没匹配到，返回原值
-  return trimmed
+  // 缓存结果
+  if (normalizeCache.size >= CACHE_LIMIT) {
+    const firstKey = normalizeCache.keys().next().value
+    normalizeCache.delete(firstKey)
+  }
+  normalizeCache.set(trimmed, result)
+  
+  return result
 }
 
 /**
@@ -180,8 +199,13 @@ export function fuzzyMatchCity(targetCity: string, candidateCity: string): boole
     return true
   }
   
-  // 包含匹配（目标城市包含在候选城市中，或候选城市包含在目标城市中）
-  if (normalizedTarget.includes(normalizedCandidate) || normalizedCandidate.includes(normalizedTarget)) {
+  // 更严格的包含匹配：只有当较短的字符串完全包含在较长的字符串中时才匹配
+  // 避免"哈尔滨"匹配到"滨州"这种问题
+  const shorter = normalizedTarget.length <= normalizedCandidate.length ? normalizedTarget : normalizedCandidate
+  const longer = normalizedTarget.length > normalizedCandidate.length ? normalizedTarget : normalizedCandidate
+  
+  // 只有当较短的城市名完全包含在较长的城市名中时才匹配
+  if (longer.includes(shorter) && shorter.length >= 2) {
     return true
   }
   

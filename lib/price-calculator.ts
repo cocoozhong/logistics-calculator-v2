@@ -1,9 +1,13 @@
 import { PriceResult, ExpressCompany } from './types'
 import pricesData from '../prices_updated.json'
-import sfData from '../data/sf_wuxi.json'
-import shentongData from '../data/shentong.json'
+import sfData from '../sf_wuxi.json'
+import shentongData from '../shentong.json'
 import annengData from '../anneng_logistics.json'
 import { normalizeProvince, normalizeCity, fuzzyMatchCity } from './name-normalizer'
+
+// 缓存计算结果，避免重复计算
+const calculationCache = new Map<string, PriceResult[]>()
+const CACHE_SIZE_LIMIT = 100 // 限制缓存大小
 
 /**
  * 计算物流费用
@@ -13,6 +17,14 @@ import { normalizeProvince, normalizeCity, fuzzyMatchCity } from './name-normali
  * @returns 各物流公司价格结果
  */
 export function calculatePrices(province: string, city: string, weight: number): PriceResult[] {
+  // 生成缓存键
+  const cacheKey = `${province}-${city}-${weight}`
+  
+  // 检查缓存
+  if (calculationCache.has(cacheKey)) {
+    return calculationCache.get(cacheKey)!
+  }
+  
   const results: PriceResult[] = []
   
   // 计算新亮物流价格（需要具体城市）
@@ -86,6 +98,14 @@ export function calculatePrices(province: string, city: string, weight: number):
     })
   }
   
+  // 缓存结果
+  if (calculationCache.size >= CACHE_SIZE_LIMIT) {
+    // 清理最旧的缓存项
+    const firstKey = calculationCache.keys().next().value
+    calculationCache.delete(firstKey)
+  }
+  calculationCache.set(cacheKey, results)
+  
   return results.sort((a, b) => a.price - b.price)
 }
 
@@ -154,9 +174,15 @@ function calculateXinliangPriceWithDetail(province: string, city: string, weight
 
 /**
  * 计算顺丰价格（智能版本）
+ * 限制：只计算20kg以内的包裹
  */
 function calculateSFPriceWithDetail(province: string, weight: number): { price: number | null, note?: string } {
   try {
+    // 顺丰限制：只计算20kg以内
+    if (weight > 20) {
+      return { price: null, note: '顺丰只支持20kg以内包裹，请选择其他物流商' }
+    }
+    
     const regionData = getRegionByProvince((sfData as any).regions, province)
     if (!regionData) {
       return { price: null, note: '该省份暂无数据' }
@@ -174,7 +200,7 @@ function calculateSFPriceWithDetail(province: string, weight: number): { price: 
     
     return { 
       price, 
-      note: '基于省份的统一价格'
+      note: '基于省份的统一价格（≤20kg）'
     }
   } catch (error) {
     console.error('计算顺丰价格失败:', error)
@@ -192,14 +218,79 @@ function calculateShentongPriceWithDetail(province: string, weight: number): { p
       return { price: null, note: '该省份暂无数据' }
     }
     
-    const base = regionData.base
-    const extraPerKg = regionData.extra_per_kg
-    
+    // 申通快递计费规则
     let price: number
-    if (weight <= 1) {
-      price = base
+    
+    // 阶梯式计费地区（0-3kg）
+    const tieredRegions = [
+      '江苏省', '浙江省', '安徽省', '上海市', '北京市', '河北省', '天津市', '山东省', 
+      '河南省', '湖北省', '湖南省', '江西省', '福建省', '广东省', '陕西省', '重庆市', 
+      '山西省', '贵州省', '辽宁省', '吉林省', '广西', '云南省', '四川省', '黑龙江', '海南省'
+    ]
+    
+    if (tieredRegions.includes(province)) {
+      // 阶梯式计费地区
+      if (weight <= 1) {
+        price = 3.5  // 0-1kg固定价格
+      } else if (weight <= 2) {
+        price = 4.0  // 1.01-2kg固定价格
+      } else if (weight <= 3) {
+        price = 4.5  // 2.01-3kg固定价格
+      } else {
+        // 3kg以上：按续重单价分组
+        let extraPerKg: number
+        
+        // 续重0.8元/kg：江苏省、浙江省、安徽省、上海市
+        if (['江苏省', '浙江省', '安徽省', '上海市'].includes(province)) {
+          extraPerKg = 0.8
+        }
+        // 续重1.6元/kg：北京市、河北省、天津市、山东省、河南省、湖北省、湖南省、江西省、福建省
+        else if (['北京市', '河北省', '天津市', '山东省', '河南省', '湖北省', '湖南省', '江西省', '福建省'].includes(province)) {
+          extraPerKg = 1.6
+        }
+        // 续重1.8元/kg：广东省
+        else if (['广东省'].includes(province)) {
+          extraPerKg = 1.8
+        }
+        // 续重2.2元/kg：陕西省、重庆市、山西省、贵州省、辽宁省、吉林省、广西、云南省、四川省、黑龙江
+        else if (['陕西省', '重庆市', '山西省', '贵州省', '辽宁省', '吉林省', '广西', '云南省', '四川省', '黑龙江'].includes(province)) {
+          extraPerKg = 2.2
+        }
+        // 续重3.5元/kg：海南省
+        else if (['海南省'].includes(province)) {
+          extraPerKg = 3.5
+        }
+        // 其他地区使用数据中的续重单价
+        else {
+          extraPerKg = regionData.extra_per_kg
+        }
+        
+        // 3kg以上：面单3.5元 + 实际重量 × 续重单价
+        price = 3.5 + weight * extraPerKg
+      }
     } else {
-      price = base + (weight - 1) * extraPerKg
+      // 无阶梯式计费地区：只有续重
+      let extraPerKg: number
+      
+      // 面单3.5，续重4：青海、宁夏、内蒙、甘肃
+      if (['青海', '宁夏', '内蒙', '甘肃'].includes(province)) {
+        extraPerKg = 4
+      }
+      // 面单3.5续重12元：新疆
+      else if (['新疆'].includes(province)) {
+        extraPerKg = 12
+      }
+      // 面单3.5续重15元：西藏
+      else if (['西藏'].includes(province)) {
+        extraPerKg = 15
+      }
+      // 其他地区使用数据中的续重单价
+      else {
+        extraPerKg = regionData.extra_per_kg
+      }
+      
+      // 统一计费：面单3.5元 + 实际重量 × 续重单价
+      price = 3.5 + weight * extraPerKg
     }
     
     return { 
@@ -215,7 +306,7 @@ function calculateShentongPriceWithDetail(province: string, weight: number): { p
 /**
  * 计算安能价格（标准/定时达）
  * 数据来源：anneng_logistics.json -> tables.anneng / tables.anneng_timed
- * 规则：优先按城市匹配，其次按省份匹配；计价=unit_price * weight；返回对应时效
+ * 规则：15kg起运，5元固定面单费，单价*实际重量+5=总费用
  */
 function calculateAnnengPriceWithDetail(
   product: 'standard' | 'timed',
@@ -262,11 +353,12 @@ function calculateAnnengPriceWithDetail(
       return { price: null, leadTime: '', note: '参数不完整' }
     }
 
-    const price = unit * effectiveWeight
+    // 新计算方式：单价*实际重量+5元固定面单费
+    const price = unit * effectiveWeight + 5
     const leadTime = matched.time || ''
     const scope = matched.cities?.some((c: string) => fuzzyMatchCity(normalizedCity, c)) ? '城市精确' : '省份参考'
     const extra = weight < 15 ? '（起运按15kg计）' : ''
-    return { price, leadTime, note: `安能${product === 'standard' ? '标准' : '定时达'} · ${scope}报价${extra}` }
+    return { price, leadTime, note: `安能${product === 'standard' ? '标准' : '定时达'} · ${scope}报价${extra}（含5元面单费）` }
   } catch (error) {
     console.error('计算安能价格失败:', error)
     return { price: null, leadTime: '', note: '计算失败' }
@@ -308,7 +400,7 @@ function calculateXinliangPrice(province: string, city: string, weight: number):
       const cities = Object.keys(provinceData)
       if (cities.length > 0) {
         cityData = (provinceData as any)[cities[0]]
-        console.log(`使用省份 ${province} 的参考价格（基于 ${cities[0]}）`)
+        // 使用省份参考价格
       }
     }
     

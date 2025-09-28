@@ -74,6 +74,7 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
   const [showDropdown, setShowDropdown] = useState(false)
   // 本地受控的重量输入字符串，避免被父级状态回写造成闪烁
   const [weightInput, setWeightInput] = useState('')
+  const weightInputRef = React.useRef<HTMLInputElement>(null)
 
   // 处理文字输入模式
   const handleTextInput = (value: string) => {
@@ -234,6 +235,23 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
     onWeightChange(0)
     setWeightInput('')
   }
+
+  // 禁用重量输入框的滚轮事件
+  useEffect(() => {
+    const weightInput = weightInputRef.current
+    if (weightInput) {
+      const handleWheel = (e: WheelEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      
+      weightInput.addEventListener('wheel', handleWheel, { passive: false })
+      
+      return () => {
+        weightInput.removeEventListener('wheel', handleWheel)
+      }
+    }
+  }, [])
 
   // 清除所有输入
   const clearAll = () => {
@@ -436,13 +454,16 @@ export default function AddressInput({ onAddressChange, onWeightChange, weight, 
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <Input
+                ref={weightInputRef}
                 type="number"
                 placeholder="请输入重量"
                 value={weightInput}
                 onChange={(e) => handleWeightChange(e.target.value)}
-                className="pr-10"
+                onWheel={(e) => e.preventDefault()}
+                className="pr-10 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 min="0.01"
                 step="0.1"
+                style={{ MozAppearance: 'textfield' }}
               />
               {weight > 0 && (
                 <Button
