@@ -104,7 +104,7 @@ export function normalizeProvince(province: string): string {
     return normalizeCache.get(trimmed)!
   }
   
-  let result: string
+  let result: string = trimmed // 初始化默认值
   
   // 直接映射
   if (PROVINCE_NORMALIZE_MAP[trimmed]) {
@@ -117,13 +117,14 @@ export function normalizeProvince(province: string): string {
         break
       }
     }
-    result = result || trimmed
   }
   
   // 缓存结果
   if (normalizeCache.size >= CACHE_LIMIT) {
     const firstKey = normalizeCache.keys().next().value
-    normalizeCache.delete(firstKey)
+    if (firstKey) {
+      normalizeCache.delete(firstKey)
+    }
   }
   normalizeCache.set(trimmed, result)
   

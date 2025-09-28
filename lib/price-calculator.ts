@@ -102,7 +102,9 @@ export function calculatePrices(province: string, city: string, weight: number):
   if (calculationCache.size >= CACHE_SIZE_LIMIT) {
     // 清理最旧的缓存项
     const firstKey = calculationCache.keys().next().value
-    calculationCache.delete(firstKey)
+    if (firstKey) {
+      calculationCache.delete(firstKey)
+    }
   }
   calculationCache.set(cacheKey, results)
   
